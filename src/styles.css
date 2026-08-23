@@ -1,0 +1,120 @@
+.page-content {
+  box-sizing: border-box;
+  min-height: calc(100vh - 60px);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content > *:not(router-outlet) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+:root {
+  --color-primary: #0070f3;
+  --color-secondary: #1c1c1e;
+  --color-background: white ;
+  --color-text: #333333;
+
+}
+
+html, body {
+  margin: 0 ;
+  padding: 0;
+  background-color: var(--color-background);
+}
+
+body {
+  min-height: 100vh;       /* asegura 100% del alto visible */
+  min-height: 100dvh;      /* versión moderna, corrige el bug de mobile con la barra de URL */
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;  /* evita que paddings/bordes rompan el 100% */
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: calc(100vh - 60px);
+}
+
+/** botones **/
+.clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: all .2s ease-in-out;
+}
+
+/* SUBMIT BTN */
+.submit-btn {
+  position: relative;
+  margin-top: .3rem;
+  background: #0A0A0A;
+  color: #FFFFFF;
+  border: 1px solid #0A0A0A;
+  border-radius: 10px;
+  padding: .8rem;
+  font-size: .92rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s ease, transform .15s ease;
+}
+
+.submit-btn:hover {
+  background: #262626;
+}
+
+.submit-btn:active {
+  transform: scale(.98);
+}
+
+.submit-btn:disabled {
+  cursor: not-allowed;
+}
+/*SPINNER BTN */
+.btn-spinner {
+  display: none;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255,255,255,.35);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+.submit-btn.loading .btn-label {
+  opacity: 0;
+}
+
+.submit-btn.loading .btn-spinner {
+  display: block;
+  position: absolute;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/** display: flex : ORIENTACIONES**/
+.d-flex-center-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+
+@media (max-width: 768px) {
+  .page-content {
+    padding-top: 60px;
+  }
+}

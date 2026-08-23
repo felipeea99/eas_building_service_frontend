@@ -1,0 +1,261 @@
+.login-page {
+  --bg: #FAFAFA;
+  --card: #FFFFFF;
+  --border: #E7E7E7;
+  --border-focus: #0A0A0A;
+  --text: #0A0A0A;
+  --text-secondary: hsl(0, 0%, 42%);
+  --text-tertiary: #9A9A9A;
+  --error: #D92D20;
+  --blue: #07539b;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  background: var(--bg);
+  height: 100%;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+}
+.logo-login{
+  width: 60%;
+}
+
+.login-header{
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+/* Columna izquierda: imagen, 60% */
+.login-visual {
+  flex: 0 0 50%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.login-visual-img {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Columna derecha: form, 50% */
+.login-form-side {
+  flex: 0 0 50%;
+  display: flex;
+  /* align-items: center;
+  justify-content: center; */
+  padding: 1.5rem;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.04);
+  box-sizing: border-box;
+  height: fit-content;
+}
+
+.login-head {
+  margin-bottom: 1.85rem;
+}
+
+.login-head h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 .35rem;
+  letter-spacing: -.015em;
+  color: var(--text);
+}
+
+.login-head p {
+  font-size: .85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.login-icons{
+  color: black;
+  margin-right: 1rem;
+}
+
+
+/* Banner de error del servidor (credenciales inválidas, etc.) */
+.server-error {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: rgba(217,45,32,.06);
+  border: 1px solid rgba(217,45,32,.2);
+  color: var(--error);
+  border-radius: 10px;
+  padding: .7rem .85rem;
+  font-size: .85rem;
+  margin-bottom: 1.25rem;
+  box-sizing: border-box;
+}
+
+.server-error svg {
+  flex-shrink: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+
+.field label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.field input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .7rem .85rem;
+  color: var(--text);
+  font-size: .92rem;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.field input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.field input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(10,10,10,.08);
+}
+
+.password-wrap {
+  position: relative;
+  display: flex;
+}
+
+.password-wrap input {
+  padding-right: 2.5rem;
+}
+
+.toggle-visibility {
+  position: absolute;
+  right: .55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: .3rem;
+  display: flex;
+}
+
+.toggle-visibility:hover {
+  color: var(--text);
+}
+
+.error-msg {
+  font-size: .76rem;
+  color: var(--error);
+}
+
+.field.invalid input {
+  border-color: var(--error);
+}
+
+.field.invalid input:focus {
+  box-shadow: 0 0 0 3px rgba(217,45,32,.1);
+}
+
+.field-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -.4rem;
+}
+
+.forgot-link {
+  font-size: .8rem;
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 1.75rem;
+  font-size: .8rem;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+
+
+/* MOBILE: la imagen pasa a ser fondo, el card flota encima */
+@media (max-width: 768px) {
+
+  .login-page {
+    flex-direction: column;
+    position: relative;
+    padding: 0;
+  }
+
+  .login-visual {
+    position: absolute;
+    inset: 0;
+    flex: none;
+    z-index: 0;
+  }
+
+  .login-visual-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .login-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,.55) 100%);
+  }
+
+  .login-form-side {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+
+  .login-icons{
+    color: white;
+    margin-right: 1rem;
+  }
+
+
+  /* se sobrescribe clase de style.css */
+  ::ng-deep .page-content {
+    padding-top: 0;
+  }
+
+}
