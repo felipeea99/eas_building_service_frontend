@@ -1,4 +1,4 @@
-export interface LoginResponse {
+export interface RefreshResponse {
   token: string;
   fullName: string;
   role: string;

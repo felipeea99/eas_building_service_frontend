@@ -1,0 +1,21 @@
+<p>INCIIO</p>
+@switch(this.role) {
+  @case("Admin") {
+    <app-inicio-admin />
+  }
+  @case("Manager") {
+    <app-inicio-admin />
+  }
+  @case ("Staff") {
+    <app-inicio-admin/>
+  }
+  @case("Tenant") {
+    <app-inicio-tenant />
+  }
+  @case ("Guard") {
+    <app-inicio-guard />
+  }
+  @case("Superadmin") {
+    <app-inicio-superadmin />
+  }
+}

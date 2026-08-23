@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
+import { LoginResponse } from '../models/login-response';
 
 @Component({
   selector: 'app-login',
@@ -11,14 +12,18 @@ import { AuthService } from '../../services/auth-service';
   styleUrl: './login.css',
 })
 export class LoginComponent {
+
+  // services
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  // form
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)])
   });
 
+  // variables
   errorMessage = '';
   isLoading = false;
   showPassword = false;
@@ -30,18 +35,16 @@ export class LoginComponent {
     }
 
     const { email, password } = this.loginForm.value;
-
+    // variables login
     this.isLoading = true;
     this.errorMessage = '';
 
     this.authService.login({ email: email!, password: password! }).subscribe({
       next: (data) => {
-        const role = data.role;
-        const routeByRole: Record<string, string> = {
-          Admin: '/admin',
-          User: '/user',
-        };
-        this.router.navigateByUrl(routeByRole[role] ?? '/');
+        const loginResponse: LoginResponse = data;
+        this.authService.setAccessToken(loginResponse);
+        this.router.navigateByUrl('/inicio');
+
       },
       error: (err) => {
         this.isLoading = false;

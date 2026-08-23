@@ -1,18 +1,55 @@
-import { HttpInterceptorFn } from "@angular/common/http";
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, switchMap, throwError } from 'rxjs';
+import { AuthService } from '../services/auth-service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
-  const token = localStorage.getItem('token');
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-  if (token) {
-    const authReq = req.clone({
-      headers: req.headers.set(
-        'Authorization',
-        `Bearer ${token}`
-      )
+  const accessToken = authService.getAccessToken()?.token;
+
+  // Agregar Access Token
+  if (accessToken) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${accessToken}`
+      }
     });
-    return next(authReq);
   }
 
-  return next(req);
+  return next(req).pipe(
+
+    catchError((error: HttpErrorResponse) => {
+
+      // Access Token expirado
+      if (error.status === 401 && !req.url.includes('/api/auth/refresh')) {
+        return authService.refresh().pipe(
+          // Refresh exitoso
+          switchMap(() => {
+            const newAccessToken =
+              authService.getAccessToken()?.token;
+
+            const retryRequest = req.clone({
+              setHeaders: {
+                Authorization: `Bearer ${newAccessToken}`
+              }
+            });
+
+            return next(retryRequest);
+          }),
+
+          // Refresh Token expirado/inválido
+          catchError(refreshError => {
+            authService.clearAccessToken();
+            router.navigate(['/login']);
+            return throwError(() => refreshError);
+          })
+        );
+      }
+      return throwError(() => error);
+    })
+  );
 };
