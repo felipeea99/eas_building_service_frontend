@@ -1,0 +1,101 @@
+<div class="index-users-page">
+  <div class="users-header">
+    <div class="header-left">
+      <h1>Usuarios</h1>
+      <p>{{ filteredUsers().length }} de {{ users().length }} usuarios</p>
+    </div>
+  </div>
+
+  <app-toolbar
+    placeholder="Buscar usuario..."
+    [filters]="toolbarFilters"
+    addLabel="Nuevo usuario"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+    (addClick)="modalService.open('register-user')"
+  />
+
+  @if (isLoading()) {
+    <div class="users-loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando usuarios...</p>
+    </div>
+  } @else if (filteredUsers().length === 0) {
+    <div class="users-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <p>No se encontraron usuarios</p>
+    </div>
+  } @else {
+    <!-- Table desktop -->
+    <div class="users-table-wrapper">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of filteredUsers(); track user.id) {
+            <tr class="user-row">
+              <td class="cell-user">
+                <div class="user-identity">
+                  <div class="user-avatar">{{ user.userFullName.charAt(0).toUpperCase() }}</div>
+                  <span class="user-name">{{ user.userFullName }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="user-role">{{ getRoleLabel(user.role) }}</span>
+              </td>
+              <td>
+                <span class="user-status" [class.active]="user.status">{{ user.status ? 'Activo' : 'Inactivo' }}</span>
+              </td>
+              <td class="cell-action">
+                <app-card-menu
+                  [actions]="getMenuActions(user)"
+                  (actionClick)="onMenuAction($event, user)"
+                />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards mobile -->
+    <div class="users-cards-mobile">
+      @for (user of filteredUsers(); track user.id) {
+        <div class="mobile-card">
+          <div class="mobile-card-header">
+            <div class="mobile-user-identity">
+              <div class="user-avatar">{{ user.userFullName.charAt(0).toUpperCase() }}</div>
+              <span class="mobile-user-name">{{ user.userFullName }}</span>
+            </div>
+            <app-card-menu
+              [actions]="getMenuActions(user)"
+              (actionClick)="onMenuAction($event, user)"
+            />
+          </div>
+          <div class="mobile-card-body">
+            <div class="mobile-detail">
+              <span class="mobile-label">Rol</span>
+              <span class="mobile-value">{{ getRoleLabel(user.role) }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Estado</span>
+              <span class="mobile-value">
+                <span class="user-status" [class.active]="user.status">{{ user.status ? 'Activo' : 'Inactivo' }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

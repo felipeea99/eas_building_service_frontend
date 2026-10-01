@@ -1,0 +1,103 @@
+@if (modalService.isOpen()) {
+  <!-- Backdrop  -->
+  <div class="modal-backdrop" [class.modal-leaving]="modalService.leaving()"></div>
+
+  <!-- Modal -->
+  <div class="modal-container" [class.modal-leaving]="modalService.leaving()">
+    <div class="modal-panel">
+      <!-- Botón cerrar (X) -->
+      <button class="modal-close" (click)="modalService.close()" aria-label="Cerrar modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+
+      <!-- Despliega componentes dinámicos según tipo -->
+      <div class="modal-body">
+        @switch (modalService.state()?.type) {
+          @case ('create-building') {
+            <app-create-building />
+          }
+          @case ('create-reservable-space') {
+            <app-create-reservable-space />
+          }
+          @case ('create-reservation') {
+            <app-create-reservation />
+          }
+          @case ('edit-reservable-space') {
+            <app-edit-reservable-space />
+          }
+          @case ('create-parking-spot') {
+            <app-create-parking-spot />
+          }
+          @case ('register-user') {
+            <app-register-user />
+          }
+          @case ('create-unit') {
+            <app-create-unit />
+          }
+          @case ('edit-unit') {
+            <app-edit-unit />
+          }
+          @case ('edit-building') {
+            <app-edit-building />
+          }
+          @case ('assign-building') {
+            <app-assing-buildings />
+          }
+          @case ('create-tenant-client') {
+            <app-create-tenant-client />
+          }
+          @case ('edit-tenant-client') {
+            <app-edit-tenant-client />
+          }
+          @case ('link-user-tenant-client') {
+            <app-link-user-tenant-client />
+          }
+          @case ('create-contract') {
+            <app-create-contract />
+          }
+          @case ('tenant-client-contracts') {
+            <app-tenant-client-contracts />
+          }
+          @case ('contract-history') {
+            <app-contract-history />
+          }
+          @case ('tenant-client-notes') {
+            <app-tenant-client-notes />
+          }
+          @case ('incident-form') {
+            <app-incident-form />
+          }
+          @case ('tenant-client-incidents') {
+            <app-tenant-client-incidents />
+          }
+          @case ('survey-recipients') {
+            <app-survey-recipients />
+          }
+          @case ('reservable-space-schedule') {
+            <app-reservable-space-schedule />
+          }
+          @case ('create-authorized-visit') {
+            <app-create-authorized-visit />
+          }
+          @case ('confirm') {
+            <app-confirm-modal />
+          }
+          @case ('send-notification') {
+            <app-send-notification />
+          }
+          @case ('package-notice-form') {
+            <app-package-notice-form />
+          }
+          @default {
+            <p>Modal type no registrado: {{ modalService.state()?.type }}</p>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}

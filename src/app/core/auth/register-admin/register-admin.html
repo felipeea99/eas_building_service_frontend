@@ -1,0 +1,131 @@
+<div class="register-page">
+  <!-- IMG -->
+  <div class="register-visual">
+    <img src="/BUILDING_LOGIN.png" alt="img-register" class="register-visual-img">
+  </div>
+
+  <!-- CARD & HEADER -->
+  <div class="register-form-side">
+    <!-- HEADER -->
+    <div class="register-header">
+      <app-theme-toggle class="register-icons clickable" />
+      <div class="icons clickable">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-info-circle register-icons" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+          <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- CARD -->
+    <div class="d-flex-center-column" style="height: 100%; padding:1rem;">
+      <div class="register-card">
+        <div class="register-head">
+          <div class="d-flex-center-column">
+            <img src="/EAS_BLACK_LOGO.png" class="logo-register app-logo" alt="Logo">
+            <h1>Crear cuenta de administrador</h1>
+            <p>Registra los datos de la empresa y del administrador principal</p>
+          </div>
+        </div>
+
+        <form class="register-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+          @if (serverError) {
+            <div class="server-error">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+              </svg>
+              <span>{{ serverError }}</span>
+            </div>
+          }
+
+          <!-- Empresa -->
+          <div class="field" [class.invalid]="registerForm.controls.companyName.invalid && registerForm.controls.companyName.touched">
+            <label for="companyName">Nombre de la empresa</label>
+            <input type="text" id="companyName" formControlName="companyName" placeholder="Mi Empresa S.A." autocomplete="organization">
+            @if (registerForm.controls.companyName.invalid && registerForm.controls.companyName.touched) {
+              <span class="error-msg">El nombre de la empresa es requerido</span>
+            }
+          </div>
+
+          <!-- Nombre / Apellido paterno -->
+          <div class="field-grid">
+            <div class="field" [class.invalid]="registerForm.controls.firstName.invalid && registerForm.controls.firstName.touched">
+              <label for="firstName">Nombre</label>
+              <input type="text" id="firstName" formControlName="firstName" placeholder="Juan" autocomplete="given-name">
+              @if (registerForm.controls.firstName.invalid && registerForm.controls.firstName.touched) {
+                <span class="error-msg">El nombre es requerido</span>
+              }
+            </div>
+
+            <div class="field">
+              <label for="middleName">Segundo nombre <span class="optional-tag">(opcional)</span></label>
+              <input type="text" id="middleName" formControlName="middleName" placeholder="Alberto" autocomplete="additional-name">
+            </div>
+          </div>
+
+          <!-- Apellidos -->
+          <div class="field-grid">
+            <div class="field" [class.invalid]="registerForm.controls.lastName.invalid && registerForm.controls.lastName.touched">
+              <label for="lastName">Apellido paterno</label>
+              <input type="text" id="lastName" formControlName="lastName" placeholder="Pérez" autocomplete="family-name">
+              @if (registerForm.controls.lastName.invalid && registerForm.controls.lastName.touched) {
+                <span class="error-msg">El apellido es requerido</span>
+              }
+            </div>
+
+            <div class="field">
+              <label for="secondLastName">Apellido materno <span class="optional-tag">(opcional)</span></label>
+              <input type="text" id="secondLastName" formControlName="secondLastName" placeholder="García" autocomplete="family-name">
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="field" [class.invalid]="registerForm.controls.email.invalid && registerForm.controls.email.touched">
+            <label for="email">Email</label>
+            <input type="email" id="email" formControlName="email" placeholder="tu@empresa.com" autocomplete="email">
+            @if (registerForm.controls.email.invalid && registerForm.controls.email.touched) {
+              <span class="error-msg">Email inválido</span>
+            }
+          </div>
+
+          <!-- Password -->
+          <div class="field" [class.invalid]="registerForm.controls.password.invalid && registerForm.controls.password.touched">
+            <label for="password">Contraseña</label>
+            <div class="password-wrap">
+              <input
+                [type]="showPassword() ? 'text' : 'password'"
+                id="password"
+                formControlName="password"
+                placeholder="••••••••"
+                autocomplete="new-password"
+              >
+              <button type="button" class="toggle-visibility" (click)="showPassword.set(!showPassword())" aria-label="Mostrar contraseña">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/></svg>
+              </button>
+            </div>
+            @if (registerForm.controls.password.invalid && registerForm.controls.password.touched) {
+              <div class="password-errors">
+                @for (entry of passwordErrors | keyvalue; track entry.key) {
+                  @if (registerForm.controls.password.hasError(entry.key)) {
+                    <span class="error-msg">{{ entry.value }}</span>
+                  }
+                }
+              </div>
+            }
+          </div>
+
+          <button type="submit" class="submit-btn" [class.loading]="isLoading" [disabled]="isLoading">
+            <span class="btn-label">Crear cuenta</span>
+            <span class="btn-spinner"></span>
+          </button>
+        </form>
+
+        <div class="register-footer">
+          ¿Ya tienes una cuenta? <a routerLink="/login" class="clickable">Inicia sesión</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

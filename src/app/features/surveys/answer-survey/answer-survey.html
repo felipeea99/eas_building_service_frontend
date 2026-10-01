@@ -1,0 +1,114 @@
+<div class="answer-page">
+  @if (isLoading()) {
+    <div class="page-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando encuesta...</p>
+    </div>
+  } @else if (loadError()) {
+    <div class="page-state">
+      <p>{{ loadError() }}</p>
+      <a routerLink="/my-surveys" class="ghost-btn">Volver a mis encuestas</a>
+    </div>
+  } @else if (survey(); as s) {
+    <div class="page-header">
+      <h1>{{ s.title }}</h1>
+      @if (s.description) {
+        <p class="description">{{ s.description }}</p>
+      }
+      @if (s.endsAt && s.isOpen && !s.respondedAt && !submitted()) {
+        <span class="deadline">Disponible hasta el {{ s.endsAt | date:'dd/MM/yy HH:mm' }}</span>
+      }
+    </div>
+
+    @if (submitted() || s.respondedAt) {
+      <!-- Ya contestada -->
+      <div class="final-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <h2>¡Gracias por responder!</h2>
+        <p>
+          @if (s.respondedAt && !submitted()) { Contestaste esta encuesta el {{ s.respondedAt | date:'dd/MM/yy' }}. }
+          @else { Tu respuesta quedó registrada. }
+        </p>
+        <a routerLink="/my-surveys" class="ghost-btn">Volver a mis encuestas</a>
+      </div>
+    } @else if (!s.isOpen) {
+      <div class="final-state">
+        <h2>Esta encuesta no está disponible</h2>
+        <p>Ya cerró o todavía no abre.</p>
+        <a routerLink="/my-surveys" class="ghost-btn">Volver a mis encuestas</a>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="answer-form">
+        @for (q of s.questions; track q.id) {
+          <fieldset class="question" [class.invalid]="isInvalid(q)">
+            <legend>
+              <span class="q-number">{{ q.order }}.</span>
+              {{ q.text }}
+              @if (q.isRequired) { <span class="required" title="Obligatoria">*</span> }
+            </legend>
+
+            @switch (q.typeValue) {
+              @case (Type.SingleChoice) {
+                <div class="choices">
+                  @for (option of q.options; track option.id) {
+                    <label class="choice">
+                      <input type="radio" [formControlName]="q.id" [value]="option.id">
+                      <span>{{ option.text }}</span>
+                    </label>
+                  }
+                </div>
+              }
+              @case (Type.MultipleChoice) {
+                <div class="choices">
+                  @for (option of q.options; track option.id) {
+                    <label class="choice">
+                      <input type="checkbox" [checked]="isChecked(q, option.id)" (change)="toggleOption(q, option.id)">
+                      <span>{{ option.text }}</span>
+                    </label>
+                  }
+                </div>
+                <span class="hint">Puedes elegir varias</span>
+              }
+              @case (Type.Rating) {
+                <div class="rating">
+                  @for (value of ratingValues; track value) {
+                    <button type="button" class="rating-btn" [class.active]="control(q).value === value"
+                      (click)="setValue(q, value)" [attr.aria-label]="value + ' de 5'">{{ value }}</button>
+                  }
+                </div>
+                <div class="rating-legend"><span>Muy mal</span><span>Excelente</span></div>
+              }
+              @case (Type.YesNo) {
+                <div class="yes-no">
+                  <button type="button" class="rating-btn wide" [class.active]="control(q).value === 1" (click)="setValue(q, 1)">Sí</button>
+                  <button type="button" class="rating-btn wide" [class.active]="control(q).value === 0" (click)="setValue(q, 0)">No</button>
+                </div>
+              }
+              @case (Type.Text) {
+                <textarea rows="3" [formControlName]="q.id" [attr.maxlength]="textLimit" placeholder="Escribe tu respuesta"></textarea>
+                <span class="hint right">{{ textLimit - textLength(q) }}</span>
+              }
+            }
+
+            @if (isInvalid(q)) {
+              <span class="error-msg">Esta pregunta es obligatoria</span>
+            }
+          </fieldset>
+        }
+
+        @if (serverError()) {
+          <div class="server-error">{{ serverError() }}</div>
+        }
+
+        <button type="submit" class="submit-btn" [class.loading]="isSubmitting()" [disabled]="isSubmitting()">
+          <span class="btn-label">Enviar respuestas</span>
+          <span class="btn-spinner"></span>
+        </button>
+        <p class="hint center">Una vez enviada no podrás modificar tu respuesta.</p>
+      </form>
+    }
+  }
+</div>

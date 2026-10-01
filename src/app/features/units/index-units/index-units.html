@@ -1,0 +1,120 @@
+<div class="index-units-page">
+  <div class="units-header">
+    <div class="header-left">
+      <h1>Unidades</h1>
+      @if (buildingName()) {
+        <p class="building-label">{{ buildingName() }}</p>
+      }
+      <p class="units-count">{{ filteredUnits().length }} de {{ units().length }} unidades</p>
+    </div>
+  </div>
+
+  <app-toolbar
+    placeholder="Buscar por número de unidad..."
+    [filters]="toolbarFilters"
+    addLabel="Nueva unidad"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+    (addClick)="onAddUnit()"
+  />
+
+  @if (isLoading()) {
+    <div class="units-loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando unidades...</p>
+    </div>
+  } @else if (filteredUnits().length === 0) {
+    <div class="units-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      <p>No se encontraron unidades</p>
+    </div>
+  } @else {
+    <!-- Table desktop -->
+    <div class="units-table-wrapper">
+      <table class="units-table">
+        <thead>
+          <tr>
+            <th>Unidad</th>
+            <th>Tipo</th>
+            <th>Piso</th>
+            <th>Sección</th>
+            <th class="align-right">Renta</th>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (unit of filteredUnits(); track unit.id) {
+            <tr class="unit-row">
+              <td class="cell-unit">{{ unit.unitName }}</td>
+              <td class="cell-type">{{ getTypeLabel(unit.type) }}</td>
+              <td>{{ unit.floor }}</td>
+              <td>{{ unit.section }}</td>
+              <td class="cell-rent align-right">${{ unit.baseRent | number:'1.2-2' }}</td>
+              <td class="cell-tenant">{{ unit.tenantClientName || '—' }}</td>
+              <td>
+                <span class="unit-status" [class]="'status-' + unit.status.toLowerCase()">{{ getStatusLabel(unit.status) }}</span>
+              </td>
+              <td class="cell-action">
+                <button class="edit-btn" (click)="onMenuAction(menuActions[0], unit)" title="Editar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards mobile -->
+    <div class="units-cards-mobile">
+      @for (unit of filteredUnits(); track unit.id) {
+        <div class="mobile-card">
+          <div class="mobile-card-header">
+            <span class="mobile-unit-number">{{ unit.unitName }}</span>
+            <span class="unit-status" [class]="'status-' + unit.status.toLowerCase()">{{ getStatusLabel(unit.status) }}</span>
+          </div>
+          <div class="mobile-card-body">
+            <div class="mobile-detail">
+              <span class="mobile-label">Tipo</span>
+              <span class="mobile-value">{{ getTypeLabel(unit.type) }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Piso / Sección</span>
+              <span class="mobile-value">{{ unit.floor }} / {{ unit.section }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Renta</span>
+              <span class="mobile-value rent">${{ unit.baseRent | number:'1.2-2' }}</span>
+            </div>
+            @if (unit.tenantClientName) {
+              <div class="mobile-detail">
+                <span class="mobile-label">Cliente</span>
+                <span class="mobile-value">{{ unit.tenantClientName }}</span>
+              </div>
+            }
+          </div>
+          <div class="mobile-actions">
+          <button class="mobile-edit-btn" (click)="onMenuAction(menuActions[0], unit)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Editar
+          </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

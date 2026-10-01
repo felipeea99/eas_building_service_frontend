@@ -1,1 +1,80 @@
-<p>inicio-admin works!</p>
+<div class="buildings-page">
+  <div class="buildings-header">
+    <div class="header-top">
+      <div>
+        <h1>Edificios</h1>
+        <p>{{ filteredBuildings().length }} de {{ buildings().length }} edificios</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seguimientos de la bitácora (solo se muestra si hay pendientes) -->
+  <app-follow-ups-widget />
+
+  <app-toolbar
+    placeholder="Buscar por nombre o dirección..."
+    [filters]="toolbarFilters"
+    addLabel="Nuevo edificio"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+    (addClick)="modalService.open('create-building')"
+  />
+
+  @if (isLoading()) {
+    <div class="buildings-loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando edificios...</p>
+    </div>
+  } @else if (filteredBuildings().length === 0) {
+    <div class="buildings-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/>
+        <path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/>
+        <path d="M8 14h.01"/><path d="M16 14h.01"/>
+      </svg>
+      <p>No se encontraron edificios</p>
+    </div>
+  } @else {
+    <div class="buildings-grid">
+      @for (building of filteredBuildings(); track building.id) {
+        <div class="building-card" (click)="goToDashboard(building)">
+          <!-- Imagen del edificio -->
+          <div class="card-image">
+            @if (building.imageS3) {
+              <app-img-loader [src]="building.imageS3" [alt]="building.name" />
+            } @else {
+              <div class="building-img-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/>
+                  <path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/>
+                  <path d="M8 14h.01"/><path d="M16 14h.01"/>
+                </svg>
+              </div>
+            }
+          <div class="occ-badge" [ngClass]="getOccupancyClass(building)">{{ getOccupancyPercent(building) }}%</div>
+          </div>
+
+          <div class="card-body">
+            <div class="building-info">
+              <span class="building-name">{{ building.name }}</span>
+              <span class="building-address">{{ building.address }}</span>
+            </div>
+
+            <!-- Occupancy bar -->
+            <div class="occupancy-section">
+              <div class="occupancy-header">
+                <span class="occupancy-label">Ocupación</span>
+                <span class="occupancy-value">{{ building.occupiedUnits }}/{{ building.totalUnits }}</span>
+              </div>
+              <div class="occupancy-bar">
+                <div class="occupancy-fill" [ngClass]="getOccupancyClass(building)" [style.width.%]="getOccupancyPercent(building)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

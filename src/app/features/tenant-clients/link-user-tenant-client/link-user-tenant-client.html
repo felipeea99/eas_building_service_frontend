@@ -1,0 +1,62 @@
+<div class="link-user-tenant-client">
+  <div class="form-head">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="head-icon">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="8.5" cy="7" r="4"/>
+      <line x1="20" y1="8" x2="20" y2="14"/>
+      <line x1="23" y1="11" x2="17" y2="11"/>
+    </svg>
+    <h2>Vincular usuario a cliente</h2>
+    <p>Selecciona un cliente sin cuenta y un usuario disponible para vincularlos</p>
+  </div>
+
+  @if (serverError()) {
+    <div class="server-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+      </svg>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.tenantClientId.invalid && form.controls.tenantClientId.touched">
+        <label for="tenantClientId">Cliente *</label>
+        <select id="tenantClientId" formControlName="tenantClientId" [class.preselected]="clientPreselected()">
+          <option value="" disabled>{{ loadingClients() ? 'Cargando clientes...' : 'Selecciona un cliente' }}</option>
+          @for (client of clients(); track client.id) {
+            <option [value]="client.id">{{ client.displayName }}</option>
+          }
+        </select>
+        @if (form.controls.tenantClientId.invalid && form.controls.tenantClientId.touched) {
+          <span class="error-msg">Selecciona un cliente</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.userId.invalid && form.controls.userId.touched">
+        <label for="userId">Usuario *</label>
+        <select id="userId" formControlName="userId">
+          <option value="" disabled>{{ loadingUsers() ? 'Cargando usuarios...' : 'Selecciona un usuario' }}</option>
+          @for (user of users(); track user.id) {
+            <option [value]="user.id">{{ user.userFullName }} - {{ ['SuperAdmin','Admin','Manager','Staff','Guard','Inquilino'][user.role] }}</option>
+          }
+        </select>
+        @if (form.controls.userId.invalid && form.controls.userId.touched) {
+          <span class="error-msg">Selecciona un usuario</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()">
+        <span class="btn-label">{{ isLoading() ? 'Vinculando...' : 'Vincular usuario' }}</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

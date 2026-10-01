@@ -1,0 +1,205 @@
+<div class="index-contracts-page">
+  <div class="contracts-header">
+    <div class="header-left">
+      <h1>Contratos</h1>
+      <p>{{ filteredContracts().length }} de {{ contracts().length }} contratos</p>
+    </div>
+  </div>
+
+  <app-toolbar
+    placeholder="Buscar por unidad o cliente..."
+    [filters]="toolbarFilters"
+    addLabel="Nuevo contrato"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+    (addClick)="onAddContract()"
+  />
+
+  @if (isLoading()) {
+    <div class="contracts-loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando contratos...</p>
+    </div>
+  } @else if (filteredContracts().length === 0) {
+    <div class="contracts-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>No se encontraron contratos</p>
+    </div>
+  } @else {
+    <!-- Table desktop -->
+    <div class="contracts-table-wrapper">
+      <table class="contracts-table">
+        <thead>
+          <tr>
+            <th>Unidad</th>
+            <th>Cliente</th>
+            <th>Tipo</th>
+            <th>Vigencia</th>
+            <th class="align-right">Renta</th>
+            <th>Documento</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (contract of filteredContracts(); track contract.id) {
+            <tr class="contract-row">
+              <td class="cell-unit">{{ contract.unitNumber }}</td>
+              <td class="cell-tenant">
+                <button type="button" class="tenant-link" (click)="openTenantClientContracts(contract)" title="Ver todos sus contratos">
+                  {{ contract.tenantClientName }}
+                </button>
+              </td>
+              <td>{{ getContractTypeLabel(contract.contractType) }}</td>
+              <td class="cell-dates">{{ contract.startDate | date:'dd/MM/yy':'UTC' }} — {{ contract.endDate | date:'dd/MM/yy':'UTC' }}</td>
+              <td class="cell-rent align-right">${{ contract.monthlyRent | number:'1.2-2' }}</td>
+              <td>
+                @if (contract.isSigned) {
+                  <span class="doc-badge doc-signed">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Firmado
+                  </span>
+                } @else {
+                  <span class="doc-badge doc-pending">Pendiente</span>
+                }
+              </td>
+              <td>
+                <span class="contract-status" [class]="'status-' + contract.contractStatus.toLowerCase()">
+                  {{ getStatusLabel(contract.contractStatus) }}
+                </span>
+              </td>
+              <td class="cell-actions">
+                <button type="button" class="row-action-btn" (click)="openHistory(contract)" title="Historial">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </button>
+                @if (contract.isSigned) {
+                  <button type="button" class="row-action-btn" (click)="viewDocument(contract)" title="Ver documento">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                } @else if (!contract.isCancelled) {
+                  <button type="button" class="row-action-btn" (click)="uploadDocument(contract)" title="Subir PDF">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                  </button>
+                }
+                @if (!contract.isCancelled) {
+                  <button type="button" class="row-action-btn action-cancel" (click)="cancelContract(contract)" title="Cancelar contrato">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="15" y1="9" x2="9" y2="15"/>
+                      <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards mobile -->
+    <div class="contracts-cards-mobile">
+      @for (contract of filteredContracts(); track contract.id) {
+        <div class="mobile-card">
+          <div class="mobile-card-header">
+            <div class="mobile-top-left">
+              <span class="mobile-unit">{{ contract.unitNumber }}</span>
+              <button type="button" class="mobile-tenant tenant-link" (click)="openTenantClientContracts(contract)">
+                {{ contract.tenantClientName }}
+              </button>
+            </div>
+            <span class="contract-status" [class]="'status-' + contract.contractStatus.toLowerCase()">
+              {{ getStatusLabel(contract.contractStatus) }}
+            </span>
+          </div>
+          <div class="mobile-card-body">
+            <div class="mobile-detail">
+              <span class="mobile-label">Tipo</span>
+              <span class="mobile-value">{{ getContractTypeLabel(contract.contractType) }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Vigencia</span>
+              <span class="mobile-value">{{ contract.startDate | date:'dd/MM/yy':'UTC' }} — {{ contract.endDate | date:'dd/MM/yy':'UTC' }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Renta</span>
+              <span class="mobile-value rent">${{ contract.monthlyRent | number:'1.2-2' }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Documento</span>
+              <span class="mobile-value">
+                @if (contract.isSigned) {
+                  <span class="doc-badge doc-signed">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Firmado
+                  </span>
+                } @else {
+                  <span class="doc-badge doc-pending">Pendiente</span>
+                }
+              </span>
+            </div>
+          </div>
+          <div class="mobile-actions">
+            <button type="button" class="mobile-action-btn" (click)="openHistory(contract)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              Historial
+            </button>
+            @if (contract.isSigned) {
+              <button type="button" class="mobile-action-btn" (click)="viewDocument(contract)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Ver documento
+              </button>
+            } @else if (!contract.isCancelled) {
+              <button type="button" class="mobile-action-btn" (click)="uploadDocument(contract)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Subir PDF
+              </button>
+            }
+            @if (!contract.isCancelled) {
+              <button type="button" class="mobile-action-btn action-cancel" (click)="cancelContract(contract)">Cancelar</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

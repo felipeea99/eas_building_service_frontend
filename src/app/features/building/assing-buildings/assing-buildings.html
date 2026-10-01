@@ -1,0 +1,62 @@
+<div class="assign-buildings">
+  <div class="form-head">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="head-icon">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <h2>Asignar usuario a edificio</h2>
+    <p>Selecciona un edificio y un usuario para realizar la asignación</p>
+  </div>
+
+  @if (serverError()) {
+    <div class="server-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+      </svg>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Edificio -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="form.controls.buildingId.invalid && form.controls.buildingId.touched">
+        <label for="assign-buildingId">Edificio</label>
+        <select id="assign-buildingId" formControlName="buildingId" (change)="onBuildingChange($event)">
+          <option value="" disabled>{{ loadingBuildings() ? 'Cargando edificios...' : 'Selecciona un edificio' }}</option>
+          @for (building of buildings(); track building.buildingId) {
+            <option [value]="building.buildingId">{{ building.buildingName }}</option>
+          }
+        </select>
+        @if (form.controls.buildingId.invalid && form.controls.buildingId.touched) {
+          <span class="error-msg">Selecciona un edificio</span>
+        }
+      </div>
+    </div>
+
+    <!-- Usuario -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="form.controls.tenantUserId.invalid && form.controls.tenantUserId.touched">
+        <label for="assign-tenantUserId">Usuario</label>
+        <select id="assign-tenantUserId" formControlName="tenantUserId">
+          <option value="" disabled>{{ loadingUsers() ? 'Cargando usuarios...' : 'Selecciona un usuario' }}</option>
+          @for (user of users(); track user.id) {
+            <option [value]="user.id">{{ user.userFullName }} - {{ ['SuperAdmin','Admin','Manager','Staff','Guard','Inquilino'][user.role] }}</option>
+          }
+        </select>
+        @if (form.controls.tenantUserId.invalid && form.controls.tenantUserId.touched) {
+          <span class="error-msg">Selecciona un usuario</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()">
+        <span class="btn-label">Asignar usuario</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

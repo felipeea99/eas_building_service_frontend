@@ -1,0 +1,94 @@
+<div class="qr-scanner-page">
+  <div class="scanner-header">
+    <h1>Escáner QR</h1>
+    <p>Escanea el código QR del visitante para validar su acceso</p>
+  </div>
+
+  <div class="scanner-container">
+    <!-- Área del lector -->
+    <div class="scanner-area">
+      <div id="qr-reader" #qrReader></div>
+
+      @if (scanning()) {
+        <button class="stop-btn" (click)="stopScanner()">Detener cámara</button>
+      }
+    </div>
+
+    <!-- Loading de validación -->
+    @if (isLoading()) {
+      <div class="validation-loading">
+        <div class="loading-spinner"></div>
+        <p>Validando código QR...</p>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (errorMessage()) {
+      <div class="scanner-error">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+          <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+        </svg>
+        <span>{{ errorMessage() }}</span>
+      </div>
+      <button class="scan-btn retry" (click)="resetScanner(); startScanner()">Reintentar</button>
+    }
+
+    <!-- Resultado de validación -->
+    @if (validationResult(); as result) {
+      <div class="validation-result" [class.valid]="result.isValid" [class.invalid]="!result.isValid">
+        <div class="result-icon">
+          @if (result.isValid) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+          }
+        </div>
+
+        <h2>{{ result.isValid ? 'Acceso válido' : 'Acceso no válido' }}</h2>
+        <p class="result-message">{{ result.message }}</p>
+
+        <div class="result-details">
+          <div class="result-row">
+            <span class="result-label">Visitante</span>
+            <span class="result-value">{{ result.visitorName }}</span>
+          </div>
+          @if (result.purpose) {
+            <div class="result-row">
+              <span class="result-label">Propósito</span>
+              <span class="result-value">{{ result.purpose }}</span>
+            </div>
+          }
+        </div>
+
+        @if (result.isValid) {
+          <div class="result-actions">
+            <button class="action-btn entry" (click)="registerEntry()" [disabled]="actionLoading()">
+              <span class="btn-label">Registrar entrada</span>
+              @if (actionLoading()) {
+                <span class="btn-spinner"></span>
+              }
+            </button>
+            <button class="action-btn exit" (click)="registerExit()" [disabled]="actionLoading()">
+              <span class="btn-label">Registrar salida</span>
+              @if (actionLoading()) {
+                <span class="btn-spinner"></span>
+              }
+            </button>
+          </div>
+        }
+
+        <button class="scan-btn new-scan" (click)="resetScanner(); startScanner()">Escanear otro código</button>
+      </div>
+    }
+  </div>
+</div>

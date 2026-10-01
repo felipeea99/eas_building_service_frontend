@@ -1,0 +1,109 @@
+<div class="create-reservation">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Nueva reservación</h2>
+      <p>Elige el espacio, el día y el horario disponible</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="form.controls.spaceId.invalid && form.controls.spaceId.touched">
+        <label for="spaceId">Espacio</label>
+        <select id="spaceId" formControlName="spaceId" (change)="onSpaceChange()">
+          <option value="" disabled>-- Selecciona un espacio --</option>
+          @for (space of spaces; track space.reservableSpaceId) {
+            <option [value]="space.reservableSpaceId">{{ space.name }} ({{ space.type }})</option>
+          }
+        </select>
+        @if (spaces.length === 0) {
+          <span class="field-hint">No hay espacios con horario configurado.</span>
+        } @else if (hiddenSpacesCount > 0) {
+          <span class="field-hint">{{ hiddenSpacesCount }} {{ hiddenSpacesCount === 1 ? 'espacio no aparece' : 'espacios no aparecen' }} porque están inactivos o sin horario.</span>
+        }
+      </div>
+    </div>
+
+    @if (isLoadingSchedule()) {
+      <div class="inline-loading"><div class="loading-spinner"></div><span>Cargando horario...</span></div>
+    }
+
+    @if (schedule(); as s) {
+      <div class="schedule-summary">
+        <span class="summary-name">{{ s.spaceName }}</span>
+        <span class="summary-dot">·</span>
+        <span>{{ getSlotUnitLabel(s.slotUnit) }}</span>
+        <span class="summary-dot">·</span>
+        <span>Abre: {{ openDaysLabel() || 'ningún día' }}</span>
+      </div>
+
+      <div class="form-fields">
+        <div class="form-group" [class.invalid]="form.controls.date.invalid && form.controls.date.touched">
+          <label for="date">Día</label>
+          <input id="date" type="date" formControlName="date" [min]="minDate" [max]="maxDate()" (change)="onDateChange()" />
+          <span class="field-hint">Hasta {{ s.maxAdvanceDays }} días de anticipación</span>
+        </div>
+      </div>
+    }
+
+    @if (isLoadingSlots()) {
+      <div class="inline-loading"><div class="loading-spinner"></div><span>Buscando horarios disponibles...</span></div>
+    } @else if (availability(); as a) {
+      @if (!a.isOpen) {
+        <div class="slots-empty">El espacio está cerrado ese día. Elige otro.</div>
+      } @else if (!hasAvailableSlots()) {
+        <div class="slots-empty">No hay horarios disponibles ese día ({{ a.openTime }} – {{ a.closeTime }}).</div>
+      } @else {
+        <div class="slots-section">
+          <div class="slots-header">
+            <span class="slots-title">Horario · {{ a.openTime }} – {{ a.closeTime }}</span>
+            <span class="slots-rule">Bloques: mín. {{ a.minSlots }} · máx. {{ a.maxSlots ?? 'sin límite' }}</span>
+          </div>
+
+          <div class="slots-grid">
+            @for (slot of a.slots; track slot.startUtc; let i = $index) {
+              <button type="button" class="slot-chip"
+                [class.is-selected]="isSelected(i)"
+                [disabled]="!slot.isAvailable"
+                [title]="slot.reason ?? (slot.localStart + ' – ' + slot.localEnd)"
+                (click)="onSlotClick(i)">
+                {{ slot.localStart }}
+              </button>
+            }
+          </div>
+
+          <span class="field-hint">
+            @if (selectionLabel()) {
+              Seleccionado: <strong>{{ selectionLabel() }}</strong> ({{ selectedCount() }} {{ selectedCount() === 1 ? 'bloque' : 'bloques' }})
+            } @else {
+              Toca el bloque de inicio y después el de fin.
+            }
+          </span>
+        </div>
+      }
+    }
+
+    <div class="form-fields">
+      <div class="form-group full-width">
+        <label for="purpose">Propósito (opcional)</label>
+        <textarea id="purpose" rows="3" formControlName="purpose" placeholder="Describe el propósito de la reservación..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [disabled]="isCreating() || !selectionLabel()" [class.loading]="isCreating()">
+        <span class="btn-label">Crear reservación</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

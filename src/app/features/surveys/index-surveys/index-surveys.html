@@ -1,0 +1,137 @@
+<div class="surveys-page">
+  <div class="page-header">
+    <h1>Encuestas</h1>
+    <p>{{ filteredSurveys().length }} de {{ surveys().length }} encuestas</p>
+  </div>
+
+  <app-toolbar
+    placeholder="Buscar por título..."
+    [filters]="toolbarFilters"
+    addLabel="Nueva encuesta"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+    (addClick)="onAdd()"
+  />
+
+  @if (isLoading()) {
+    <div class="page-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando encuestas...</p>
+    </div>
+  } @else if (filteredSurveys().length === 0) {
+    <div class="page-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      <p>{{ surveys().length ? 'Sin resultados' : 'Aún no hay encuestas en este edificio' }}</p>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Encuesta</th>
+            <th>Estado</th>
+            <th>Vigencia</th>
+            <th>Respuestas</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (survey of filteredSurveys(); track survey.id) {
+            <tr class="data-row" [class.is-busy]="busyId() === survey.id">
+              <td class="cell-title">
+                <span class="cell-strong">{{ survey.title }}</span>
+                <span class="cell-sub">
+                  {{ survey.questionCount }} {{ survey.questionCount === 1 ? 'pregunta' : 'preguntas' }} ·
+                  {{ survey.audience === 'Building' ? 'Todo el edificio' : 'Clientes específicos' }}
+                </span>
+              </td>
+              <td><span class="state-pill" [class]="'state-pill ' + getStateClass(survey)">{{ getStateLabel(survey) }}</span></td>
+              <td class="cell-dates">
+                @if (survey.startsAt || survey.endsAt) {
+                  {{ survey.startsAt ? (survey.startsAt | date:'dd/MM/yy HH:mm') : 'Al publicar' }}
+                  — {{ survey.endsAt ? (survey.endsAt | date:'dd/MM/yy HH:mm') : 'sin cierre' }}
+                } @else {
+                  —
+                }
+              </td>
+              <td>
+                @if (survey.state === 'Draft') {
+                  —
+                } @else {
+                  <div class="rate">
+                    <span>{{ survey.responseCount }}/{{ survey.recipientCount }}</span>
+                    <div class="rate-bar"><div class="rate-fill" [style.width.%]="getResponseRate(survey)"></div></div>
+                    <span class="rate-pct">{{ getResponseRate(survey) }}%</span>
+                  </div>
+                }
+              </td>
+              <td class="cell-actions">
+                @if (survey.state === 'Draft') {
+                  <button type="button" class="action-btn" (click)="edit(survey)" [disabled]="busyId() !== null">Editar</button>
+                  <button type="button" class="action-btn" (click)="publish(survey)" [disabled]="busyId() !== null">Publicar</button>
+                  <button type="button" class="icon-btn danger" (click)="deleteDraft(survey)" [disabled]="busyId() !== null" title="Eliminar borrador">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    </svg>
+                  </button>
+                } @else {
+                  <button type="button" class="action-btn" (click)="openResults(survey)">Resultados</button>
+                  <button type="button" class="action-btn" (click)="openRecipients(survey)">Destinatarios</button>
+                  @if (survey.state === 'Published') {
+                    <button type="button" class="action-btn" (click)="close(survey)" [disabled]="busyId() !== null">Cerrar</button>
+                  }
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards mobile -->
+    <div class="cards-mobile">
+      @for (survey of filteredSurveys(); track survey.id) {
+        <div class="mobile-card" [class.is-busy]="busyId() === survey.id">
+          <div class="mobile-top">
+            <span class="cell-strong">{{ survey.title }}</span>
+            <span class="state-pill" [class]="'state-pill ' + getStateClass(survey)">{{ getStateLabel(survey) }}</span>
+          </div>
+          <span class="cell-sub">
+            {{ survey.questionCount }} preguntas
+            @if (survey.state !== 'Draft') { · {{ survey.responseCount }}/{{ survey.recipientCount }} respuestas }
+          </span>
+          <div class="mobile-actions">
+            @if (survey.state === 'Draft') {
+              <button type="button" class="action-btn" (click)="edit(survey)" [disabled]="busyId() !== null">Editar</button>
+              <button type="button" class="action-btn" (click)="publish(survey)" [disabled]="busyId() !== null">Publicar</button>
+              <button type="button" class="action-btn danger" (click)="deleteDraft(survey)" [disabled]="busyId() !== null">Eliminar</button>
+            } @else {
+              <button type="button" class="action-btn" (click)="openResults(survey)">Resultados</button>
+              <button type="button" class="action-btn" (click)="openRecipients(survey)">Destinatarios</button>
+              @if (survey.state === 'Published') {
+                <button type="button" class="action-btn" (click)="close(survey)" [disabled]="busyId() !== null">Cerrar</button>
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Wizard: crear / editar borrador -->
+@if (editorOpen()) {
+  <app-wizard
+    [steps]="wizardSteps"
+    [closeOnFinish]="false"
+    [busy]="isSaving()"
+    [finishLabel]="editorInitial() ? 'Guardar cambios' : 'Guardar borrador'"
+    (finished)="onEditorFinished($event)"
+    (cancelled)="onEditorCancelled()">
+    <app-survey-editor [buildingId]="buildingId" [initial]="editorInitial()" />
+  </app-wizard>
+}

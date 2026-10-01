@@ -1,0 +1,112 @@
+<div class="create-contract">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Nuevo contrato</h2>
+      <p>Crea un contrato de renta para una unidad</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  @if (serverError()) {
+    <div class="server-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+      </svg>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Unidad y Cliente -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.unitId.invalid && form.controls.unitId.touched">
+        <label for="contract-unitId">Unidad</label>
+        <select id="contract-unitId" formControlName="unitId">
+          <option value="" disabled>{{ loadingUnits() ? 'Cargando...' : 'Selecciona una unidad' }}</option>
+          @for (unit of units(); track unit.id) {
+            <option [value]="unit.id">{{ unit.unitName }} — ${{ unit.baseRent }}</option>
+          }
+        </select>
+        @if (form.controls.unitId.invalid && form.controls.unitId.touched) {
+          <span class="error-msg">Selecciona una unidad</span>
+        }
+      </div>
+
+      <div class="form-group" [class.invalid]="form.controls.tenantClientId.invalid && form.controls.tenantClientId.touched">
+        <label for="contract-tenantClientId">Cliente</label>
+        <select id="contract-tenantClientId" formControlName="tenantClientId">
+          <option value="" disabled>{{ loadingClients() ? 'Cargando...' : 'Selecciona un cliente' }}</option>
+          @for (client of clients(); track client.id) {
+            <option [value]="client.id">{{ client.displayName }}</option>
+          }
+        </select>
+        @if (form.controls.tenantClientId.invalid && form.controls.tenantClientId.touched) {
+          <span class="error-msg">Selecciona un cliente</span>
+        }
+      </div>
+    </div>
+
+    <!-- Fechas -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.startDate.invalid && form.controls.startDate.touched">
+        <label for="contract-startDate">Fecha inicio</label>
+        <input id="contract-startDate" type="date" formControlName="startDate" />
+        @if (form.controls.startDate.invalid && form.controls.startDate.touched) {
+          <span class="error-msg">Requerido</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.endDate.invalid && form.controls.endDate.touched">
+        <label for="contract-endDate">Fecha fin</label>
+        <input id="contract-endDate" type="date" formControlName="endDate" />
+        @if (form.controls.endDate.invalid && form.controls.endDate.touched) {
+          <span class="error-msg">Requerido</span>
+        }
+      </div>
+    </div>
+
+    <!-- Renta y tipo de contrato -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.monthlyRent.invalid && form.controls.monthlyRent.touched">
+        <label for="contract-monthlyRent">Renta mensual ($)</label>
+        <input id="contract-monthlyRent" type="number" formControlName="monthlyRent" min="0" step="0.01" />
+        @if (form.controls.monthlyRent.invalid && form.controls.monthlyRent.touched) {
+          <span class="error-msg">Requerido</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.contractType.invalid && form.controls.contractType.touched">
+        <label for="contract-contractType">Tipo de contrato</label>
+        <select id="contract-contractType" formControlName="contractType">
+          @for (c of contractTypes; track c.value) {
+            <option [value]="c.value">{{ c.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Documento PDF (opcional) -->
+    <div class="form-fields">
+      <div class="form-group full-width">
+        <label for="contract-document">Documento firmado (PDF, opcional)</label>
+        <input id="contract-document" type="file" accept="application/pdf" (change)="onFileChange($event)" />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isSubmitting()" [disabled]="isSubmitting()">
+        <span class="btn-label">Crear contrato</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

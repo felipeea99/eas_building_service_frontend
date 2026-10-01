@@ -1,0 +1,62 @@
+<div class="my-surveys-page">
+  <div class="page-header">
+    <h1>Mis encuestas</h1>
+    <p>Tu opinión ayuda a mejorar tu edificio</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="page-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando encuestas...</p>
+    </div>
+  } @else if (loadError()) {
+    <div class="page-state">
+      <p>{{ loadError() }}</p>
+      <button type="button" class="ghost-btn" (click)="load()">Reintentar</button>
+    </div>
+  } @else if (surveys().length === 0) {
+    <div class="page-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      <p>No tienes encuestas por ahora</p>
+    </div>
+  } @else {
+    @if (pending().length) {
+      <h2 class="section-title">Pendientes</h2>
+      <ul class="survey-list">
+        @for (survey of pending(); track survey.id) {
+          <li class="survey-item">
+            <div class="item-main">
+              <span class="item-title">{{ survey.title }}</span>
+              <span class="item-meta">
+                {{ survey.buildingName }}
+                @if (survey.endsAt) { · cierra {{ survey.endsAt | date:'dd/MM/yy HH:mm' }} }
+              </span>
+            </div>
+            <a class="answer-btn" [routerLink]="['/my-surveys', survey.id]">Contestar</a>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (others().length) {
+      <h2 class="section-title">Anteriores</h2>
+      <ul class="survey-list">
+        @for (survey of others(); track survey.id) {
+          <li class="survey-item muted">
+            <div class="item-main">
+              <span class="item-title">{{ survey.title }}</span>
+              <span class="item-meta">
+                {{ survey.buildingName }}
+                @if (survey.respondedAt) { · contestada el {{ survey.respondedAt | date:'dd/MM/yy' }} }
+              </span>
+            </div>
+            <span class="status-pill" [class.done]="survey.respondedAt">{{ getStatus(survey) }}</span>
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>

@@ -1,0 +1,120 @@
+<div class="results-page">
+  @if (isLoading()) {
+    <div class="page-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando resultados...</p>
+    </div>
+  } @else if (loadError()) {
+    <div class="page-state">
+      <p>{{ loadError() }}</p>
+      <button type="button" class="action-btn" (click)="load()">Reintentar</button>
+    </div>
+  } @else if (results(); as r) {
+    <div class="page-header">
+      <div>
+        <h1>{{ r.title }}</h1>
+        <p>{{ getStateLabel(r.state) }}</p>
+      </div>
+      <button type="button" class="action-btn" (click)="openRecipients()">Ver destinatarios</button>
+    </div>
+
+    <!-- KPIs (Stripe style) -->
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">Destinatarios</span>
+        <span class="stat-value">{{ r.recipientCount }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Respuestas</span>
+        <span class="stat-value">{{ r.responseCount }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Tasa de respuesta</span>
+        <span class="stat-value">{{ r.responseRate | number:'1.0-1' }}%</span>
+      </div>
+    </div>
+
+    @if (r.responseCount === 0) {
+      <div class="page-state small">
+        <p>Aún no hay respuestas</p>
+      </div>
+    }
+
+    <div class="questions">
+      @for (q of r.questions; track q.questionId) {
+        <section class="question">
+          <div class="question-head">
+            <span class="question-number">{{ q.order }}</span>
+            <div>
+              <h2>{{ q.text }}</h2>
+              <span class="question-meta">{{ getTypeLabel(q.type) }} · {{ q.answeredCount }} {{ q.answeredCount === 1 ? 'respuesta' : 'respuestas' }}</span>
+            </div>
+          </div>
+
+          @switch (q.type) {
+            @case ('Rating') {
+              <div class="rating">
+                <div class="rating-avg">
+                  <span class="avg-value">{{ q.average !== null ? (q.average | number:'1.1-1') : '—' }}</span>
+                  <span class="avg-label">promedio de 5</span>
+                </div>
+                <div class="bars">
+                  @for (value of ratingValues; track value) {
+                    <div class="bar-row">
+                      <span class="bar-label">{{ value }}</span>
+                      <div class="bar"><div class="bar-fill" [style.width.%]="percent(ratingCount(q, value), q.answeredCount)"></div></div>
+                      <span class="bar-count">{{ ratingCount(q, value) }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+            @case ('YesNo') {
+              <div class="bars">
+                <div class="bar-row">
+                  <span class="bar-label wide">Sí</span>
+                  <div class="bar"><div class="bar-fill" [style.width.%]="percent(q.yesCount ?? 0, q.answeredCount)"></div></div>
+                  <span class="bar-count">{{ q.yesCount ?? 0 }} · {{ percent(q.yesCount ?? 0, q.answeredCount) }}%</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-label wide">No</span>
+                  <div class="bar"><div class="bar-fill muted" [style.width.%]="percent(q.noCount ?? 0, q.answeredCount)"></div></div>
+                  <span class="bar-count">{{ q.noCount ?? 0 }} · {{ percent(q.noCount ?? 0, q.answeredCount) }}%</span>
+                </div>
+              </div>
+            }
+            @case ('Text') {
+              @if (q.textAnswers.length === 0) {
+                <p class="empty">Sin respuestas</p>
+              } @else {
+                <ul class="text-answers">
+                  @for (answer of q.textAnswers; track $index) {
+                    <li>
+                      <p>{{ answer.text }}</p>
+                      <span>{{ answer.tenantClientName }} · {{ answer.submittedAt | date:'dd/MM/yy' }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+            }
+            @default {
+              <!-- Opción única / múltiple -->
+              <div class="bars">
+                @for (option of q.options; track option.optionId) {
+                  <div class="bar-row">
+                    <span class="bar-label wide" [title]="option.text">{{ option.text }}</span>
+                    <div class="bar"><div class="bar-fill" [style.width.%]="option.percentage"></div></div>
+                    <span class="bar-count">{{ option.count }} · {{ option.percentage | number:'1.0-1' }}%</span>
+                  </div>
+                }
+              </div>
+              @if (q.type === 'MultipleChoice') {
+                <p class="note">Opción múltiple: los porcentajes pueden sumar más de 100%.</p>
+              }
+            }
+          }
+        </section>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,294 @@
+.register-page {
+  /* Alias a las variables globales de styles.css */
+  --bg: var(--color-bg);
+  --card: var(--color-surface);
+  --border: var(--color-border);
+  --border-focus: var(--color-border-focus);
+  --text: var(--color-text);
+  --text-secondary: var(--color-text-secondary);
+  --text-tertiary: var(--color-text-tertiary);
+  --error: var(--color-error);
+  --blue: var(--color-link);
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  background: var(--bg);
+  height: 100%;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.logo-register {
+  width: 60%;
+}
+
+.register-header {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* Columna izquierda: imagen */
+.register-visual {
+  flex: 0 0 50%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.register-visual-img {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Columna derecha: form */
+.register-form-side {
+  flex: 0 0 50%;
+  display: flex;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.04);
+  box-sizing: border-box;
+  height: fit-content;
+}
+
+.register-head {
+  margin-bottom: 1.85rem;
+}
+
+.register-head h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 .35rem;
+  letter-spacing: -.015em;
+  color: var(--text);
+  text-align: center;
+}
+
+.register-head p {
+  font-size: .85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.register-icons {
+  color: var(--text);
+  margin-right: 1rem;
+}
+
+/* Banner de error del servidor */
+.server-error {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--error);
+  border-radius: 10px;
+  padding: .7rem .85rem;
+  font-size: .85rem;
+  margin-bottom: 1.25rem;
+  box-sizing: border-box;
+}
+
+.server-error svg {
+  flex-shrink: 0;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+/* Grid para pares de campos (nombre/segundo nombre, apellidos) */
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+
+.field label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.optional-tag {
+  font-weight: 400;
+  color: var(--text-tertiary);
+  font-size: .75rem;
+}
+
+.field input {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .7rem .85rem;
+  color: var(--text);
+  font-size: .92rem;
+  font-family: Arial, sans-serif;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .2s ease;
+}
+
+.field input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.field input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(10,10,10,.08);
+}
+
+.password-wrap {
+  position: relative;
+  display: flex;
+}
+
+.password-wrap input {
+  padding-right: 2.5rem;
+}
+
+.toggle-visibility {
+  position: absolute;
+  right: .55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: .3rem;
+  display: flex;
+}
+
+.toggle-visibility:hover {
+  color: var(--text);
+}
+
+.error-msg {
+  font-size: .76rem;
+  color: var(--error);
+}
+
+.field.invalid input {
+  border-color: var(--error);
+}
+
+.field.invalid input:focus {
+  box-shadow: 0 0 0 3px rgba(217,45,32,.1);
+}
+
+.password-errors {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  margin-top: .1rem;
+}
+
+.password-errors .error-msg {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 1.75rem;
+  font-size: .8rem;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+.register-footer a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+  .register-page {
+    flex-direction: column;
+    position: relative;
+    padding: 0;
+  }
+
+  .register-visual {
+    position: absolute;
+    inset: 0;
+    flex: none;
+    z-index: 0;
+  }
+
+  .register-visual-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .register-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,.55) 100%);
+  }
+
+  .register-form-side {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .register-icons {
+    /* Sobre la foto de fondo el ícono siempre necesita contraste blanco,
+       sin importar el tema (no está relacionado con dark mode). */
+    color: white;
+    margin-right: 1rem;
+  }
+
+  ::ng-deep .page-content {
+    padding-top: 0;
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 380px) {
+  .register-form-side {
+    padding: 1rem;
+  }
+
+  .register-card {
+    padding: 1.75rem 1.25rem;
+  }
+}

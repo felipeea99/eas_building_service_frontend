@@ -1,0 +1,58 @@
+<div class="survey-recipients">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Destinatarios</h2>
+      <p>{{ title() || 'Encuesta' }}</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  @if (isLoading()) {
+    <div class="state-box">
+      <div class="loading-spinner"></div>
+      <p>Cargando destinatarios...</p>
+    </div>
+  } @else if (loadError()) {
+    <div class="server-error">{{ loadError() }}</div>
+  } @else {
+    <div class="segments">
+      <button type="button" class="segment" [class.active]="filter() === 'all'" (click)="setFilter('all')">
+        Todos · {{ recipients().length }}
+      </button>
+      <button type="button" class="segment" [class.active]="filter() === 'responded'" (click)="setFilter('responded')">
+        Contestaron · {{ respondedCount() }}
+      </button>
+      <button type="button" class="segment" [class.active]="filter() === 'pending'" (click)="setFilter('pending')">
+        Pendientes · {{ recipients().length - respondedCount() }}
+      </button>
+    </div>
+
+    @if (visible().length === 0) {
+      <div class="state-box"><p>Nadie en esta lista</p></div>
+    } @else {
+      <ul class="recipient-list">
+        @for (recipient of visible(); track recipient.tenantClientId) {
+          <li class="recipient-item">
+            <div class="recipient-main">
+              <span class="recipient-name">{{ recipient.name }}</span>
+              <span class="recipient-email">{{ recipient.email }}</span>
+            </div>
+            @if (recipient.respondedAt) {
+              <span class="responded">Contestó {{ recipient.respondedAt | date:'dd/MM/yy HH:mm' }}</span>
+            } @else {
+              <span class="pending">Pendiente</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>

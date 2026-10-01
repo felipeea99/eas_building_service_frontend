@@ -1,0 +1,85 @@
+<div class="package-form">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+        <path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Avisar paquete</h2>
+      <p>Avisa a caseta que recibirás una entrega</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  @if (!loadingUnits() && units().length === 0 && !serverError()) {
+    <div class="info-box">
+      No tienes locales con contrato vigente. Solo puedes avisar paquetes para un local que estés rentando.
+    </div>
+    <div class="form-actions">
+      <button type="button" class="ghost-btn" (click)="cancel()">Cerrar</button>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group full-width"
+        [class.invalid]="form.controls.unitId.touched && form.controls.unitId.invalid">
+        <label for="package-unit">Edificio y local</label>
+        <select id="package-unit" formControlName="unitId">
+          <option value="">{{ loadingUnits() ? 'Cargando...' : 'Selecciona un local' }}</option>
+          @for (unit of units(); track unit.unitId) {
+            <option [value]="unit.unitId">{{ unitLabel(unit) }}</option>
+          }
+        </select>
+        @if (form.controls.unitId.touched && form.controls.unitId.invalid) {
+          <span class="error-msg">Selecciona el local</span>
+        }
+      </div>
+
+      <div class="form-fields">
+        <div class="form-group"
+          [class.invalid]="form.controls.carrierCompany.touched && form.controls.carrierCompany.invalid">
+          <label for="package-company">Empresa que entrega</label>
+          <input id="package-company" type="text" formControlName="carrierCompany"
+            [attr.maxlength]="limits.carrierCompany" placeholder="Ej. DHL, Amazon, Liverpool">
+          @if (form.controls.carrierCompany.touched && form.controls.carrierCompany.invalid) {
+            <span class="error-msg">Indica la empresa</span>
+          }
+        </div>
+        <div class="form-group"
+          [class.invalid]="form.controls.expectedDate.touched && form.controls.expectedDate.invalid">
+          <label for="package-date">¿Cuándo llega?</label>
+          <input id="package-date" type="date" formControlName="expectedDate" [min]="minDate">
+          @if (form.controls.expectedDate.touched && form.controls.expectedDate.invalid) {
+            <span class="error-msg">Indica la fecha</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="package-item">¿Qué entregan? (opcional)</label>
+        <textarea id="package-item" rows="3" formControlName="itemDescription"
+          [attr.maxlength]="limits.itemDescription" placeholder="Ej. Un paquete mediano, una estufa..."></textarea>
+        <div class="field-foot">
+          <span></span>
+          <span class="chars-left">{{ descriptionCharsLeft }}</span>
+        </div>
+      </div>
+
+      @if (serverError()) {
+        <div class="server-error">{{ serverError() }}</div>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="ghost-btn" (click)="cancel()" [disabled]="isSubmitting()">Cancelar</button>
+        <button type="submit" class="submit-btn" [class.loading]="isSubmitting()"
+          [disabled]="isSubmitting() || loadingUnits()">
+          <span class="btn-label">Enviar aviso</span>
+          <span class="btn-spinner"></span>
+        </button>
+      </div>
+    </form>
+  }
+</div>

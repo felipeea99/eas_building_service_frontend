@@ -1,0 +1,535 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+}
+
+.index-contracts-page {
+  --bg: var(--color-bg);
+  --card: var(--color-surface);
+  --border: var(--color-border);
+  --text: var(--color-text);
+  --text-secondary: var(--color-text-secondary);
+  --text-tertiary: var(--color-text-tertiary);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--bg);
+  padding: 2rem;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.contracts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+
+.contracts-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -.015em;
+}
+
+.contracts-header p {
+  font-size: .82rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+app-toolbar { margin-bottom: .5rem; }
+
+/* Loading */
+.contracts-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 0;
+  color: var(--text-secondary);
+  font-size: .9rem;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Empty */
+.contracts-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  padding: 4rem 0;
+  color: var(--text-tertiary);
+}
+
+.contracts-empty p { font-size: .9rem; margin: 0; }
+
+/* ===== TABLE ===== */
+.contracts-table-wrapper {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+  margin-top: .75rem;
+}
+
+.contracts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+}
+
+.contracts-table thead {
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+}
+
+.contracts-table th {
+  text-align: left;
+  padding: .65rem 1rem;
+  font-size: .7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.contracts-table td {
+  padding: .7rem 1rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.contract-row {
+  transition: background .1s ease;
+}
+
+.contract-row:first-child td {
+  border-top: none;
+}
+
+.contract-row:hover {
+  background: rgba(0,0,0,.02);
+}
+
+/* No zebra — clean Stripe style */
+
+/* Dark: header bg, hover, zebra */
+:host-context([data-theme="dark"]) .contracts-table thead {
+  background: transparent;
+}
+
+:host-context([data-theme="dark"]) .contract-row:hover {
+  background: rgba(255,255,255,.04);
+}
+
+
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-theme="light"])) .contracts-table thead {
+    background: transparent;
+  }
+  :host-context(:root:not([data-theme="light"])) .contract-row:hover {
+    background: rgba(255,255,255,.04);
+  }
+  
+}
+
+
+.cell-unit {
+  font-weight: 700;
+  color: var(--text) !important;
+  font-size: .88rem;
+}
+
+.cell-tenant {
+  color: var(--text) !important;
+  font-weight: 500;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell-dates {
+  font-size: .78rem;
+  letter-spacing: -.01em;
+}
+
+.cell-rent {
+  font-weight: 600;
+  color: var(--color-success) !important;
+}
+
+.align-right,
+.contracts-table th.align-right { text-align: right; }
+
+/* Document badge */
+.doc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: .68rem;
+  font-weight: 600;
+  padding: .2rem .55rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+.doc-signed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.doc-pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+:host-context([data-theme="dark"]) .doc-pending {
+  background: rgba(245,158,11,.15);
+  color: #fbbf24;
+}
+
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-theme="light"])) .doc-pending {
+    background: rgba(245,158,11,.15);
+    color: #fbbf24;
+  }
+}
+
+:host-context([data-theme="dark"]) .doc-signed {
+  background: rgba(34,197,94,.15);
+  color: #4ade80;
+}
+
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-theme="light"])) .doc-signed {
+    background: rgba(34,197,94,.15);
+    color: #4ade80;
+  }
+}
+
+/* Status pill */
+.contract-status {
+  display: inline-block;
+  font-size: .68rem;
+  font-weight: 600;
+  padding: .2rem .55rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+.status-active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-pendingstart {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-expiringsoon {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-expired {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-cancelled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+:host-context([data-theme="dark"]) .status-active {
+  background: rgba(34,197,94,.15);
+  color: #4ade80;
+}
+
+:host-context([data-theme="dark"]) .status-pendingstart {
+  background: rgba(59,130,246,.15);
+  color: #60a5fa;
+}
+
+:host-context([data-theme="dark"]) .status-expiringsoon {
+  background: rgba(245,158,11,.15);
+  color: #fbbf24;
+}
+
+:host-context([data-theme="dark"]) .status-expired {
+  background: rgba(239,68,68,.15);
+  color: #fca5a5;
+}
+
+:host-context([data-theme="dark"]) .status-cancelled {
+  background: rgba(107,114,128,.15);
+  color: #9ca3af;
+}
+
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-theme="light"])) .status-active {
+    background: rgba(34,197,94,.15);
+    color: #4ade80;
+  }
+  :host-context(:root:not([data-theme="light"])) .status-pendingstart {
+    background: rgba(59,130,246,.15);
+    color: #60a5fa;
+  }
+  :host-context(:root:not([data-theme="light"])) .status-expiringsoon {
+    background: rgba(245,158,11,.15);
+    color: #fbbf24;
+  }
+  :host-context(:root:not([data-theme="light"])) .status-expired {
+    background: rgba(239,68,68,.15);
+    color: #fca5a5;
+  }
+  :host-context(:root:not([data-theme="light"])) .status-cancelled {
+    background: rgba(107,114,128,.15);
+    color: #9ca3af;
+  }
+}
+
+/* Row action buttons */
+.cell-actions {
+  display: flex;
+  gap: .25rem;
+  justify-content: flex-end;
+}
+
+.row-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease;
+}
+
+.row-action-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.row-action-btn.action-cancel:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+:host-context([data-theme="dark"]) .row-action-btn.action-cancel:hover {
+  background: rgba(239,68,68,.15);
+  color: #fca5a5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-theme="light"])) .row-action-btn.action-cancel:hover {
+    background: rgba(239,68,68,.15);
+    color: #fca5a5;
+  }
+}
+
+
+/* ===== MOBILE CARDS ===== */
+.contracts-cards-mobile {
+  display: none;
+  flex-direction: column;
+  gap: .6rem;
+  margin-top: .75rem;
+}
+
+.mobile-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+.mobile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-top-left {
+  display: flex;
+  flex-direction: column;
+  gap: .05rem;
+  min-width: 0;
+}
+
+.mobile-unit {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.mobile-tenant {
+  font-size: .78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .4rem .75rem;
+}
+
+.mobile-detail {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+}
+
+.mobile-label {
+  font-size: .65rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.mobile-value {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mobile-value.rent {
+  color: var(--color-success);
+}
+
+.mobile-actions {
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+}
+
+.mobile-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .35rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: .75rem;
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease;
+}
+
+.mobile-action-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.mobile-action-btn.action-cancel {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.mobile-action-btn.action-cancel:hover {
+  background: #fee2e2;
+}
+
+:host-context([data-theme="dark"]) .mobile-action-btn.action-cancel {
+  color: #fca5a5;
+  border-color: rgba(239,68,68,.25);
+}
+
+:host-context([data-theme="dark"]) .mobile-action-btn.action-cancel:hover {
+  background: rgba(239,68,68,.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-theme="light"])) .mobile-action-btn.action-cancel {
+    color: #fca5a5;
+    border-color: rgba(239,68,68,.25);
+  }
+  :host-context(:root:not([data-theme="light"])) .mobile-action-btn.action-cancel:hover {
+    background: rgba(239,68,68,.15);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .index-contracts-page {
+    padding: 1.25rem 1rem;
+  }
+
+  .contracts-header {
+    flex-direction: column;
+    gap: .75rem;
+  }
+
+  .contracts-table-wrapper {
+    display: none;
+  }
+
+  .contracts-cards-mobile {
+    display: flex;
+  }
+}
+
+/* Nombre del inquilino clickeable → modal con todos sus contratos */
+.tenant-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--color-border);
+  text-underline-offset: 3px;
+  transition: text-decoration-color .15s ease;
+}
+
+.tenant-link:hover {
+  text-decoration-color: var(--color-text);
+}

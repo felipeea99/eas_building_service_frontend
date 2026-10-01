@@ -1,0 +1,12 @@
+@if (hasSegments()) {
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    @for (segment of segments(); track segment.path; let last = $last) {
+      @if (!last) {
+        <a [routerLink]="segment.path" class="breadcrumb-link">{{ segment.label }}</a>
+        <span class="breadcrumb-separator" aria-hidden="true">/</span>
+      } @else {
+        <a [routerLink]="segment.path" class="breadcrumb-link breadcrumb-current" aria-current="page">{{ segment.label }}</a>
+      }
+    }
+  </nav>
+}

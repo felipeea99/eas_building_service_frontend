@@ -1,0 +1,51 @@
+<div class="buildings-page">
+  <div class="buildings-header">
+    <h1>Mis edificios</h1>
+    <p>Elige un edificio para continuar</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="buildings-loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando edificios...</p>
+    </div>
+  } @else if (buildings().length === 0) {
+    <div class="buildings-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/>
+        <path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/>
+        <path d="M8 14h.01"/><path d="M16 14h.01"/>
+      </svg>
+      <p>Aún no tienes edificios asignados</p>
+      <span>Pide a la administración que te dé acceso.</span>
+    </div>
+  } @else {
+    <div class="buildings-grid">
+      @for (building of buildings(); track building.id) {
+        <div class="building-card" (click)="goToDashboard(building)">
+          <div class="card-image">
+            @if (building.imageS3) {
+              <app-img-loader [src]="building.imageS3" [alt]="building.name" />
+            } @else {
+              <div class="building-img-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/>
+                  <path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/>
+                  <path d="M8 14h.01"/><path d="M16 14h.01"/>
+                </svg>
+              </div>
+            }
+          </div>
+
+          <div class="card-body">
+            <span class="building-name">{{ building.name }}</span>
+            <span class="building-address">{{ building.address }}</span>
+            <span class="card-cta">Entrar →</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

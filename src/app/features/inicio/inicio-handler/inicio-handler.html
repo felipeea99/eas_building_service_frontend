@@ -1,5 +1,10 @@
-<p>INCIIO</p>
 @switch(this.role) {
+  @case("SuperAdmin") {
+    <app-inicio-admin />
+  }
+  @case("Support") {
+    <app-inicio-admin />
+  }
   @case("Admin") {
     <app-inicio-admin />
   }
@@ -9,13 +14,11 @@
   @case ("Staff") {
     <app-inicio-admin/>
   }
-  @case("Tenant") {
-    <app-inicio-tenant />
+  <!-- Client y Guard: tarjetas de sus edificios (si tienen 1, el login los manda directo al dashboard) -->
+  @case("Client") {
+    <app-inicio-buildings />
   }
   @case ("Guard") {
-    <app-inicio-guard />
-  }
-  @case("Superadmin") {
-    <app-inicio-superadmin />
+    <app-inicio-buildings />
   }
 }

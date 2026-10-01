@@ -1,0 +1,82 @@
+<div class="my-packages-page">
+  <div class="page-header">
+    <div>
+      <h1>Mis paquetes</h1>
+      <p>Avisa a caseta cuando esperes una entrega</p>
+    </div>
+    <button type="button" class="submit-btn add-btn" (click)="onAdd()">
+      <span class="btn-label">Avisar paquete</span>
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="page-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando paquetes...</p>
+    </div>
+  } @else if (loadError()) {
+    <div class="page-state">
+      <p>{{ loadError() }}</p>
+      <button type="button" class="ghost-btn" (click)="load()">Reintentar</button>
+    </div>
+  } @else if (notices().length === 0) {
+    <div class="page-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+        <path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+      </svg>
+      <p>No has avisado ningún paquete</p>
+    </div>
+  } @else {
+    @if (pending().length) {
+      <h2 class="section-title">En espera</h2>
+      <ul class="package-list">
+        @for (notice of pending(); track notice.id) {
+          <li class="package-item" [class.is-busy]="busyId() === notice.id">
+            <div class="item-main">
+              <span class="item-title">{{ notice.carrierCompany }}</span>
+              @if (notice.itemDescription) {
+                <span class="item-desc">{{ notice.itemDescription }}</span>
+              }
+              <span class="item-meta">
+                {{ notice.buildingName }} · {{ notice.unitName }} · llega el {{ notice.expectedDate | date:'dd/MM/yy':'UTC' }}
+              </span>
+            </div>
+            <div class="item-side">
+              <span class="status-pill pending">{{ stateLabels[notice.state] }}</span>
+              <button type="button" class="ghost-btn small" (click)="onCancel(notice)" [disabled]="busyId() !== null">
+                Cancelar
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (others().length) {
+      <h2 class="section-title">Anteriores</h2>
+      <ul class="package-list">
+        @for (notice of others(); track notice.id) {
+          <li class="package-item muted">
+            <div class="item-main">
+              <span class="item-title">{{ notice.carrierCompany }}</span>
+              @if (notice.itemDescription) {
+                <span class="item-desc">{{ notice.itemDescription }}</span>
+              }
+              <span class="item-meta">
+                {{ notice.buildingName }} · {{ notice.unitName }}
+                @if (notice.state === 'Received' && notice.receivedAt) {
+                  · recibido el {{ notice.receivedAt | date:'dd/MM/yy HH:mm' }}
+                } @else if (notice.state === 'Cancelled' && notice.cancelledAt) {
+                  · cancelado el {{ notice.cancelledAt | date:'dd/MM/yy' }}
+                }
+              </span>
+            </div>
+            <span class="status-pill" [class.done]="notice.state === 'Received'">{{ stateLabels[notice.state] }}</span>
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>

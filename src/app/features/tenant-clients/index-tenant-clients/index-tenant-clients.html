@@ -1,0 +1,141 @@
+<div class="index-tenant-clients-page">
+  <div class="clients-header">
+    <div class="header-left">
+      <h1>Clientes</h1>
+      <p>{{ filteredClients().length }} de {{ tenantClients().length }} clientes</p>
+    </div>
+  </div>
+
+  <app-toolbar
+    placeholder="Buscar por nombre, email o empresa..."
+    [filters]="toolbarFilters"
+    addLabel="Nuevo cliente"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+    (addClick)="onAdd()"
+  />
+
+  @if (isLoading()) {
+    <div class="clients-loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando clientes...</p>
+    </div>
+  } @else if (filteredClients().length === 0) {
+    <div class="clients-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <p>No se encontraron clientes</p>
+    </div>
+  } @else {
+    <!-- Table desktop -->
+    <div class="clients-table-wrapper">
+      <table class="clients-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>RFC</th>
+            <th>Cuenta</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (client of filteredClients(); track client.id) {
+            <tr class="client-row" [class.inactive-row]="!client.status">
+              <td class="cell-client">
+                <div class="client-identity">
+                  <div class="client-avatar">{{ getInitials(client.fullName) }}</div>
+                  <div class="client-name-group">
+                    <span class="client-name">{{ client.displayName }}</span>
+                    @if (client.companyName && client.companyName !== client.displayName) {
+                      <span class="client-company">{{ client.companyName }}</span>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td>{{ client.email }}</td>
+              <td>{{ client.phoneNumber }}</td>
+              <td>{{ client.rfc || '—' }}</td>
+              <td>
+                @if (client.hasAccount) {
+                  <span class="account-badge has-account">Con cuenta</span>
+                } @else {
+                  <span class="account-badge no-account">Sin cuenta</span>
+                }
+              </td>
+              <td>
+                <span class="client-status" [class.active]="client.status">
+                  {{ client.status ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="cell-action">
+                <app-card-menu
+                  [actions]="getMenuActions(client)"
+                  (actionClick)="onMenuAction($event, client)"
+                />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards mobile -->
+    <div class="clients-cards-mobile">
+      @for (client of filteredClients(); track client.id) {
+        <div class="mobile-card" [class.inactive-card]="!client.status">
+          <div class="mobile-card-header">
+            <div class="mobile-client-identity">
+              <div class="client-avatar">{{ getInitials(client.fullName) }}</div>
+              <div class="mobile-name-group">
+                <span class="mobile-client-name">{{ client.displayName }}</span>
+                @if (client.companyName && client.companyName !== client.displayName) {
+                  <span class="mobile-client-company">{{ client.companyName }}</span>
+                }
+              </div>
+            </div>
+            <app-card-menu
+              [actions]="getMenuActions(client)"
+              (actionClick)="onMenuAction($event, client)"
+            />
+          </div>
+          <div class="mobile-card-body">
+            <div class="mobile-detail">
+              <span class="mobile-label">Email</span>
+              <span class="mobile-value">{{ client.email }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Teléfono</span>
+              <span class="mobile-value">{{ client.phoneNumber }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Estado</span>
+              <span class="mobile-value">
+                <span class="client-status" [class.active]="client.status">
+                  {{ client.status ? 'Activo' : 'Inactivo' }}
+                </span>
+              </span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Cuenta</span>
+              <span class="mobile-value">
+                @if (client.hasAccount) {
+                  <span class="account-badge has-account">Con cuenta</span>
+                } @else {
+                  <span class="account-badge no-account">Sin cuenta</span>
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

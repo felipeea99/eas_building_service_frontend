@@ -1,0 +1,162 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+/* Search */
+.toolbar-search {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-icon {
+  position: absolute;
+  left: .75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+.toolbar-search input {
+  width: 100%;
+  padding: .5rem .75rem .5rem 2.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: .82rem;
+  font-family: Arial, sans-serif;
+  outline: none;
+  transition: border-color .12s ease;
+  box-sizing: border-box;
+}
+
+.toolbar-search input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.toolbar-search input:focus {
+  border-color: var(--color-text);
+}
+
+.clear-btn {
+  position: absolute;
+  right: .5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: .15rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .12s ease, background .12s ease;
+}
+
+.clear-btn:hover {
+  color: var(--color-text);
+  background: var(--color-border);
+}
+
+/* Filters */
+.toolbar-filter {
+  position: relative;
+}
+
+.toolbar-filter select {
+  appearance: none;
+  padding: .5rem 2rem .5rem .75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: .82rem;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  outline: none;
+  transition: border-color .12s ease;
+}
+
+.toolbar-filter select:focus {
+  border-color: var(--color-text);
+}
+
+.select-arrow {
+  position: absolute;
+  right: .6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+/* Add button — outline style */
+.toolbar-add {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .5rem 1rem;
+  background: var(--color-text);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 6px;
+  font-size: .82rem;
+  font-weight: 600;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity .12s ease;
+}
+
+.toolbar-add:hover {
+  opacity: .88;
+}
+
+.toolbar-add:active {
+  transform: scale(.98);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-search {
+    min-width: unset;
+  }
+
+  .toolbar-filter select {
+    width: 100%;
+  }
+
+.toolbar-add {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .5rem 1rem;
+  background: var(--color-text);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 6px;
+  font-size: .82rem;
+  font-weight: 600;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity .12s ease;
+}
+}

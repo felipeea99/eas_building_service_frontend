@@ -1,0 +1,65 @@
+<div class="tenant-client-contracts">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Contratos de {{ tenantClientName() || 'inquilino' }}</h2>
+      @if (result(); as r) {
+        <p>{{ r.totalContracts }} {{ r.totalContracts === 1 ? 'contrato' : 'contratos' }} · {{ r.activeContracts }} {{ r.activeContracts === 1 ? 'vigente' : 'vigentes' }}</p>
+      } @else {
+        <p>Historial de contratos</p>
+      }
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  @if (isLoading()) {
+    <div class="state-box">
+      <div class="loading-spinner"></div>
+      <p>Cargando contratos...</p>
+    </div>
+  } @else if (loadError()) {
+    <div class="server-error">{{ loadError() }}</div>
+  } @else if (!result()?.contracts?.length) {
+    <div class="state-box">
+      <p>Este inquilino no tiene contratos</p>
+    </div>
+  } @else {
+    <ul class="contract-list">
+      @for (c of result()!.contracts; track c.id) {
+        <li class="contract-item" [class.is-current]="c.isCurrent">
+          <div class="item-main">
+            <div class="item-title">
+              <span class="item-unit">{{ c.unitNumber }}</span>
+              @if (c.isCurrent) {
+                <span class="current-badge">Vigente</span>
+              }
+            </div>
+            <span class="item-building">{{ c.buildingName }} · {{ getContractTypeLabel(c.contractType) }}</span>
+            <span class="item-dates">
+              {{ c.startDate | date:'dd/MM/yy':'UTC' }} — {{ c.endDate | date:'dd/MM/yy':'UTC' }}
+              @if (c.isCurrent && c.daysToExpire !== null) {
+                <span class="item-days">· vence en {{ c.daysToExpire }} {{ c.daysToExpire === 1 ? 'día' : 'días' }}</span>
+              }
+            </span>
+          </div>
+          <div class="item-side">
+            <span class="contract-status" [class]="'contract-status status-' + c.contractStatus.toLowerCase()">
+              {{ getStatusLabel(c.contractStatus) }}
+            </span>
+            <span class="item-rent">${{ c.monthlyRent | number:'1.2-2' }}</span>
+            <span class="item-doc">{{ c.isSigned ? 'Firmado' : 'Sin firmar' }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</div>

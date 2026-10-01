@@ -1,0 +1,35 @@
+<div class="create-parking-spot">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"/>
+        <circle cx="5.5" cy="18" r="2"/><circle cx="18.5" cy="18" r="2"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Nuevo estacionamiento</h2>
+      <p>Registra un nuevo espacio de estacionamiento</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  <div class="form-fields">
+    <div class="form-group">
+      <label>Número de espacio</label>
+      <input type="text" placeholder="Ej: A-01" [value]="spotNumber()" (input)="spotNumber.set(asInputValue($event))" />
+    </div>
+    <div class="form-group">
+      <label>Tarifa mensual</label>
+      <input type="number" placeholder="0.00" [value]="monthlyRate()" (input)="monthlyRate.set(+asInputValue($event))" />
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="submit-btn" [disabled]="isCreating()" (click)="onSubmit()">
+      <span class="btn-label">Crear estacionamiento</span>
+      <span class="btn-spinner"></span>
+    </button>
+  </div>
+</div>

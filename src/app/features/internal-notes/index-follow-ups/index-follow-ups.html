@@ -1,0 +1,89 @@
+<div class="follow-ups-page">
+  <div class="page-header">
+    <h1>Seguimientos</h1>
+    <p>{{ totalCount() }} {{ totalCount() === 1 ? 'pendiente' : 'pendientes' }} con fecha de hoy o anterior</p>
+  </div>
+
+  <app-toolbar placeholder="Buscar por cliente o nota..." (search)="onSearch($event)" />
+
+  @if (isLoading()) {
+    <div class="page-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando seguimientos...</p>
+    </div>
+  } @else if (filteredItems().length === 0) {
+    <div class="page-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <p>{{ items().length ? 'Sin resultados' : 'No hay seguimientos pendientes' }}</p>
+    </div>
+  } @else {
+    <!-- Tabla desktop -->
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Tipo</th>
+            <th>Nota</th>
+            <th>Autor</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filteredItems(); track item.id) {
+            <tr class="data-row" [class.is-busy]="busyId() === item.id">
+              <td class="cell-date">{{ item.followUpDate | date:'dd/MM/yy':'UTC' }}</td>
+              <td class="cell-client">
+                <button type="button" class="client-link" (click)="openNotes(item)" title="Abrir bitácora">
+                  {{ item.tenantClientName }}
+                </button>
+              </td>
+              <td>{{ getCategoryLabel(item.category) }}</td>
+              <td class="cell-body" [title]="item.body">{{ item.body }}</td>
+              <td>{{ item.createdByName ?? '—' }}</td>
+              <td class="cell-actions">
+                <button type="button" class="row-action-btn" (click)="complete(item)"
+                  [disabled]="busyId() !== null" title="Marcar hecho">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </button>
+                <button type="button" class="row-action-btn" (click)="openNotes(item)" title="Abrir bitácora">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards mobile -->
+    <div class="cards-mobile">
+      @for (item of filteredItems(); track item.id) {
+        <div class="mobile-card" [class.is-busy]="busyId() === item.id">
+          <div class="mobile-top">
+            <button type="button" class="client-link" (click)="openNotes(item)">{{ item.tenantClientName }}</button>
+            <span class="cell-date">{{ item.followUpDate | date:'dd/MM/yy':'UTC' }}</span>
+          </div>
+          <span class="mobile-category">{{ getCategoryLabel(item.category) }} · {{ item.createdByName ?? '—' }}</span>
+          <p class="mobile-body">{{ item.body }}</p>
+          <div class="mobile-actions">
+            <button type="button" class="mobile-action-btn" (click)="complete(item)" [disabled]="busyId() !== null">
+              Marcar hecho
+            </button>
+            <button type="button" class="mobile-action-btn" (click)="openNotes(item)">Bitácora</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

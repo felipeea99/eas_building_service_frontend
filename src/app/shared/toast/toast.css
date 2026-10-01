@@ -1,0 +1,274 @@
+/* ============================================================
+   Toast — Estilo premium con soporte dark/light mode
+   ============================================================ */
+
+.toast-container {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+  pointer-events: none;
+  max-width: 420px;
+  width: calc(100% - 2.5rem);
+}
+
+/* ---- Toast base ---- */
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: .85rem 1rem;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+  font-size: .88rem;
+  line-height: 1.4;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  /* Sombra premium */
+  box-shadow:
+    0 4px 6px -1px rgba(0,0,0,.08),
+    0 10px 20px -2px rgba(0,0,0,.06),
+    0 0 0 1px rgba(0,0,0,.04);
+
+  /* Animación de entrada */
+  animation: toastSlideIn .35s cubic-bezier(.21,1.02,.73,1) forwards;
+
+  /* Transición para hover */
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.toast:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 12px -2px rgba(0,0,0,.12),
+    0 14px 28px -4px rgba(0,0,0,.08),
+    0 0 0 1px rgba(0,0,0,.06);
+}
+
+/* Animación de salida */
+.toast-leaving {
+  animation: toastSlideOut .3s cubic-bezier(.55,.06,.68,.19) forwards;
+}
+
+/* ---- Variantes light mode ---- */
+.toast-success {
+  background: rgba(240, 253, 244, .92);
+  border: 1px solid rgba(22, 163, 74, .2);
+  color: #15803d;
+}
+
+.toast-error {
+  background: rgba(254, 242, 242, .92);
+  border: 1px solid rgba(220, 38, 38, .2);
+  color: #b91c1c;
+}
+
+.toast-warning {
+  background: rgba(255, 251, 235, .92);
+  border: 1px solid rgba(202, 138, 4, .2);
+  color: #a16207;
+}
+
+.toast-info {
+  background: rgba(239, 246, 255, .92);
+  border: 1px solid rgba(37, 99, 235, .2);
+  color: #1d4ed8;
+}
+
+/* ---- Variantes dark mode (manual) ---- */
+:host-context([data-theme="dark"]) .toast-success {
+  background: rgba(22, 163, 74, .14);
+  border-color: rgba(74, 222, 128, .2);
+  color: #86efac;
+}
+
+:host-context([data-theme="dark"]) .toast-error {
+  background: rgba(220, 38, 38, .14);
+  border-color: rgba(248, 113, 113, .2);
+  color: #fca5a5;
+}
+
+:host-context([data-theme="dark"]) .toast-warning {
+  background: rgba(202, 138, 4, .14);
+  border-color: rgba(250, 204, 21, .2);
+  color: #fde047;
+}
+
+:host-context([data-theme="dark"]) .toast-info {
+  background: rgba(37, 99, 235, .14);
+  border-color: rgba(96, 165, 250, .2);
+  color: #93bbfd;
+}
+
+/* ---- Variantes dark mode (sistema) ---- */
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-theme="light"])) .toast-success {
+    background: rgba(22, 163, 74, .14);
+    border-color: rgba(74, 222, 128, .2);
+    color: #86efac;
+  }
+
+  :host-context(:root:not([data-theme="light"])) .toast-error {
+    background: rgba(220, 38, 38, .14);
+    border-color: rgba(248, 113, 113, .2);
+    color: #fca5a5;
+  }
+
+  :host-context(:root:not([data-theme="light"])) .toast-warning {
+    background: rgba(202, 138, 4, .14);
+    border-color: rgba(250, 204, 21, .2);
+    color: #fde047;
+  }
+
+  :host-context(:root:not([data-theme="light"])) .toast-info {
+    background: rgba(37, 99, 235, .14);
+    border-color: rgba(96, 165, 250, .2);
+    color: #93bbfd;
+  }
+}
+
+/* ---- Sombras dark mode ---- */
+:host-context([data-theme="dark"]) .toast {
+  box-shadow:
+    0 4px 6px -1px rgba(0,0,0,.3),
+    0 10px 20px -2px rgba(0,0,0,.25),
+    0 0 0 1px rgba(255,255,255,.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-theme="light"])) .toast {
+    box-shadow:
+      0 4px 6px -1px rgba(0,0,0,.3),
+      0 10px 20px -2px rgba(0,0,0,.25),
+      0 0 0 1px rgba(255,255,255,.06);
+  }
+}
+
+/* ---- Icono ---- */
+.toast-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  margin-top: 1px;
+}
+
+/* ---- Mensaje ---- */
+.toast-message {
+  flex: 1;
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+
+/* ---- Botón cerrar ---- */
+.toast-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: currentColor;
+  opacity: .45;
+  cursor: pointer;
+  padding: .15rem;
+  border-radius: 6px;
+  transition: opacity .15s ease, background .15s ease;
+  margin-top: 1px;
+}
+
+.toast-close:hover {
+  opacity: .85;
+  background: rgba(128, 128, 128, .1);
+}
+
+/* ---- Barra de progreso ---- */
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2.5px;
+  width: 100%;
+  transform-origin: left;
+  animation: toastProgress linear forwards;
+  border-radius: 0 0 12px 12px;
+}
+
+.toast-success .toast-progress { background: currentColor; opacity: .35; }
+.toast-error   .toast-progress { background: currentColor; opacity: .35; }
+.toast-warning .toast-progress { background: currentColor; opacity: .35; }
+.toast-info    .toast-progress { background: currentColor; opacity: .35; }
+
+/* ---- Animaciones ---- */
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%) scale(.92);
+  }
+}
+
+@keyframes toastProgress {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 768px) {
+  .toast-container {
+    top: auto;
+    bottom: 1.25rem;
+    right: .75rem;
+    left: .75rem;
+    max-width: none;
+    width: auto;
+    align-items: stretch;
+  }
+
+  .toast {
+    font-size: .85rem;
+  }
+
+  @keyframes toastSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(100%) scale(.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes toastSlideOut {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(100%) scale(.95);
+    }
+  }
+}

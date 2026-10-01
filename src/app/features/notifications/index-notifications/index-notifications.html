@@ -1,0 +1,140 @@
+<div class="notifications-page">
+  <!-- Header -->
+  <div class="notifications-header">
+    <div>
+      <h1>Notificaciones</h1>
+      <p>{{ filtered().length }} notificación{{ filtered().length !== 1 ? 'es' : '' }}</p>
+    </div>
+
+    @if (notificationService.unreadCount() > 0) {
+      <button class="mark-all-btn" (click)="markAllAsRead()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span>Marcar todas como leídas</span>
+      </button>
+    }
+  </div>
+
+  <!-- Toolbar -->
+  <app-toolbar
+    placeholder="Buscar notificación..."
+    [filters]="toolbarFilters"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+  />
+
+  <!-- Content -->
+  @if (notificationService.loading() && notificationService.notifications().length === 0) {
+    <!-- Loading skeleton -->
+    <div class="notifications-loading">
+      @for (i of [1, 2, 3, 4, 5]; track i) {
+        <div class="notification-skeleton">
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line skeleton-title"></div>
+            <div class="skeleton-line skeleton-message"></div>
+            <div class="skeleton-line skeleton-date"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (filtered().length === 0) {
+    <!-- Empty -->
+    <div class="notifications-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <p>No se encontraron notificaciones</p>
+    </div>
+  } @else {
+    <!-- Notification list -->
+    <div class="notifications-list" (scroll)="onScroll($event)">
+      @for (n of filtered(); track n.id) {
+        <div
+          class="notification-card"
+          [class.unread]="!n.isRead"
+          (click)="markAsRead(n)">
+
+          <!-- Category icon -->
+          <div class="category-icon" [style.background]="getCategoryColor(n.eventType) + '18'" [style.color]="getCategoryColor(n.eventType)">
+            @switch (n.eventType) {
+              @case ('Reservation') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              }
+              @case ('Parking') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>
+              }
+              @case ('Payment') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              }
+              @case ('Contract') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              }
+              @case ('Maintenance') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              }
+              @case ('Visit') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              }
+              @case ('System') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              }
+              @default {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              }
+            }
+          </div>
+
+          <!-- Content -->
+          <div class="notification-body">
+            <div class="notification-top-row">
+              <span class="category-badge" [style.background]="getCategoryColor(n.eventType) + '18'" [style.color]="getCategoryColor(n.eventType)">
+                {{ getCategoryLabel(n.eventType) }}
+              </span>
+              <span class="notification-time">{{ timeAgo(n.dateCreated) }}</span>
+            </div>
+
+            <span class="notification-title">{{ n.title }}</span>
+            <span class="notification-message">{{ n.message }}</span>
+            <span class="notification-date">{{ n.dateCreated | date:'d MMM yyyy, h:mm a' }}</span>
+          </div>
+
+          <!-- Unread indicator / Mark as read -->
+          <div class="notification-actions">
+            @if (!n.isRead) {
+              <span class="unread-dot" title="No leída"></span>
+            } @else {
+              <span class="read-check" title="Leída">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </span>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Loading more spinner -->
+      @if (notificationService.loading()) {
+        <div class="loading-more">
+          <div class="loading-spinner"></div>
+        </div>
+      }
+
+      <!-- Load more trigger -->
+      @if (notificationService.hasNextPage() && !notificationService.loading()) {
+        <button class="load-more-btn" (click)="notificationService.loadMore()">
+          Cargar más
+        </button>
+      }
+    </div>
+  }
+</div>

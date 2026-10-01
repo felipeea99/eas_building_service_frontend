@@ -1,0 +1,111 @@
+<div class="create-unit">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Crear unidad</h2>
+      <p>Completa la información para registrar una nueva unidad</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  @if (serverError()) {
+    <div class="server-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+      </svg>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Edificio -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="form.controls.buildingId.invalid && form.controls.buildingId.touched">
+        <label for="buildingId">Edificio</label>
+        <select id="buildingId" formControlName="buildingId">
+          <option value="" disabled>Selecciona un edificio</option>
+          @for (building of buildings(); track building.id) {
+            <option [value]="building.id">{{ building.name }}</option>
+          }
+        </select>
+        @if (form.controls.buildingId.invalid && form.controls.buildingId.touched) {
+          <span class="error-msg">Selecciona un edificio</span>
+        }
+      </div>
+    </div>
+
+    <!-- Nombre de unidad -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="form.controls.unitName.invalid && form.controls.unitName.touched">
+        <label for="unitName">Nombre de unidad</label>
+        <input id="unitName" type="text" formControlName="unitName" placeholder="Ej: A-101" />
+        @if (form.controls.unitName.invalid && form.controls.unitName.touched) {
+          <span class="error-msg">Ingresa el número de unidad</span>
+        }
+      </div>
+    </div>
+
+    <!-- Piso y Sección -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.floor.invalid && form.controls.floor.touched">
+        <label for="floor">Piso</label>
+        <input id="floor" type="number" formControlName="floor" min="0" />
+        @if (form.controls.floor.invalid && form.controls.floor.touched) {
+          <span class="error-msg">Requerido</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.section.invalid && form.controls.section.touched">
+        <label for="section">Sección</label>
+        <input id="section" type="text" formControlName="section" maxlength="50" />
+        @if (form.controls.section.invalid && form.controls.section.touched) {
+          <span class="error-msg">Requerido</span>
+        }
+      </div>
+    </div>
+
+    <!-- Tipo -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.type.invalid && form.controls.type.touched">
+        <label for="type">Tipo</label>
+        <select id="type" formControlName="type">
+          @for (t of unitTypes; track t.value) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Área y Renta -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.areaSqm.invalid && form.controls.areaSqm.touched">
+        <label for="areaSqm">Área (m²)</label>
+        <input id="areaSqm" type="number" formControlName="areaSqm" min="1" step="0.01" />
+        @if (form.controls.areaSqm.invalid && form.controls.areaSqm.touched) {
+          <span class="error-msg">Mínimo 1 m²</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.baseRent.invalid && form.controls.baseRent.touched">
+        <label for="baseRent">Renta base ($)</label>
+        <input id="baseRent" type="number" formControlName="baseRent" min="0" step="0.01" />
+        @if (form.controls.baseRent.invalid && form.controls.baseRent.touched) {
+          <span class="error-msg">Requerido</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()">
+        <span class="btn-label">Crear unidad</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

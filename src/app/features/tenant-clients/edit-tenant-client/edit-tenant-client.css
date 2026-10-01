@@ -1,0 +1,376 @@
+/* ============================================================
+   Edit Tenant Client — Modal Form (Unified Design)
+   ============================================================ */
+
+:host {
+  display: block;
+}
+
+.edit-tenant-client {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ---- Header ---- */
+.form-head {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+}
+
+.head-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--color-error-bg);
+  flex-shrink: 0;
+}
+
+.head-icon-wrap svg {
+  width: 22px;
+  height: 22px;
+  color: var(--color-text-secondary);
+}
+
+.head-text h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.3;
+  font-family: Arial, sans-serif;
+}
+
+.head-text p {
+  font-size: .8rem;
+  color: var(--color-text-tertiary);
+  margin: .15rem 0 0;
+  line-height: 1.4;
+  font-family: Arial, sans-serif;
+}
+
+/* ---- Divider ---- */
+.form-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 0;
+  border: none;
+}
+
+/* ---- Server Error ---- */
+.server-error {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error);
+  border-radius: 8px;
+  padding: .65rem .85rem;
+  font-size: .82rem;
+  font-family: Arial, sans-serif;
+}
+
+.server-error svg { flex-shrink: 0; }
+
+/* ---- Form ---- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.form-fields {
+  display: flex;
+  gap: .85rem;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  flex: 1;
+  min-width: 180px;
+}
+
+.form-group.full-width {
+  flex-basis: 100%;
+}
+
+.form-group label {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-family: Arial, sans-serif;
+  letter-spacing: .01em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: .6rem .8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: .85rem;
+  font-family: Arial, sans-serif;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.form-group select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%239A9A9A' d='M1 1l5 5 5-5'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right .85rem center;
+  padding-right: 2.2rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* Focus */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
+}
+
+/* File input */
+.form-group input[type="file"] {
+  padding: .45rem .75rem;
+  cursor: pointer;
+}
+
+.form-group input[type="file"]::file-selector-button {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: .3rem .7rem;
+  font-size: .8rem;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  margin-right: .65rem;
+  transition: background .15s ease;
+}
+
+.form-group input[type="file"]::file-selector-button:hover {
+  background: var(--color-bg);
+}
+
+/* Date picker indicator */
+.form-group input[type="date"]::-webkit-calendar-picker-indicator,
+.form-group input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: .55;
+  transition: opacity .15s ease;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.form-group input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Validation */
+.error-msg {
+  font-size: .74rem;
+  color: var(--color-error);
+  font-family: Arial, sans-serif;
+}
+
+.form-group.invalid input,
+.form-group.invalid select,
+.form-group.invalid textarea {
+  border-color: var(--color-error);
+}
+
+.form-group.invalid input:focus,
+.form-group.invalid select:focus,
+.form-group.invalid textarea:focus {
+  box-shadow: 0 0 0 3px rgba(217, 45, 32, .08);
+}
+
+/* ---- Image upload ---- */
+.image-upload-area {
+  width: 100%;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  padding: 1.25rem;
+  border: 2px dashed var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+  color: var(--color-text-tertiary);
+}
+
+.upload-placeholder:hover {
+  border-color: var(--color-text-secondary);
+  background: rgba(0, 0, 0, .015);
+}
+
+.upload-placeholder span {
+  font-size: .82rem;
+  font-family: Arial, sans-serif;
+}
+
+.upload-hint {
+  font-size: .72rem !important;
+  color: var(--color-text-tertiary);
+}
+
+.image-preview-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  max-height: 180px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, .55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+
+.remove-image-btn:hover {
+  background: rgba(0, 0, 0, .75);
+}
+
+/* ---- Checkboxes ---- */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: .85rem 1rem;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .84rem;
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-border-focus);
+  cursor: pointer;
+}
+
+/* ---- Actions ---- */
+.form-actions {
+  display: flex;
+  gap: .65rem;
+  padding-top: .25rem;
+}
+
+.form-actions .submit-btn {
+  flex: 1;
+}
+
+/* ---- Dark mode ---- */
+:host-context([data-theme="dark"]) .form-group select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23757575' d='M1 1l5 5 5-5'/></svg>");
+}
+
+:host-context([data-theme="dark"]) .form-group select option {
+  background: #1a1a1a;
+  color: #f2f2f2;
+}
+
+:host-context([data-theme="dark"]) .form-group input:focus,
+:host-context([data-theme="dark"]) .form-group select:focus,
+:host-context([data-theme="dark"]) .form-group textarea:focus {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .06);
+}
+
+:host-context([data-theme="dark"]) .upload-placeholder:hover {
+  background: rgba(255, 255, 255, .03);
+}
+
+:host-context([data-theme="dark"]) .form-group input[type="date"]::-webkit-calendar-picker-indicator,
+:host-context([data-theme="dark"]) .form-group input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-theme="light"])) .form-group select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23757575' d='M1 1l5 5 5-5'/></svg>");
+  }
+
+  :host-context(:root:not([data-theme="light"])) .form-group select option {
+    background: #1a1a1a;
+    color: #f2f2f2;
+  }
+
+  :host-context(:root:not([data-theme="light"])) .form-group input:focus,
+  :host-context(:root:not([data-theme="light"])) .form-group select:focus,
+  :host-context(:root:not([data-theme="light"])) .form-group textarea:focus {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, .06);
+  }
+
+  :host-context(:root:not([data-theme="light"])) .upload-placeholder:hover {
+    background: rgba(255, 255, 255, .03);
+  }
+
+  :host-context(:root:not([data-theme="light"])) .form-group input[type="date"]::-webkit-calendar-picker-indicator,
+  :host-context(:root:not([data-theme="light"])) .form-group input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .form-fields { flex-direction: column; }
+  .checkbox-grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,119 @@
+<div class="packages-page">
+  <div class="page-header">
+    <h1>Paquetes</h1>
+    <p>{{ filteredNotices().length }} de {{ totalCount() }} avisos</p>
+  </div>
+
+  <div class="tabs">
+    <button type="button" class="tab" [class.active]="activeTab() === 'pending'" (click)="setTab('pending')">En espera</button>
+    <button type="button" class="tab" [class.active]="activeTab() === 'received'" (click)="setTab('received')">Recibidos</button>
+    <button type="button" class="tab" [class.active]="activeTab() === 'cancelled'" (click)="setTab('cancelled')">Cancelados</button>
+  </div>
+
+  <app-toolbar placeholder="Buscar por empresa, cliente o local..." (search)="onSearch($event)" />
+
+  @if (isLoading()) {
+    <div class="page-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando...</p>
+    </div>
+  } @else if (filteredNotices().length === 0) {
+    <div class="page-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+        <path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+      </svg>
+      <p>{{ notices().length ? 'Sin resultados' : 'No hay avisos de paquete' }}</p>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Llega</th>
+            <th>Empresa</th>
+            <th>Qué entregan</th>
+            <th>Cliente</th>
+            <th>Local</th>
+            <th>Estado</th>
+            @if (activeTab() === 'received') {
+              <th>Recibido</th>
+            }
+            @if (activeTab() === 'pending') {
+              <th></th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (notice of filteredNotices(); track notice.id) {
+            <tr class="data-row" [class.is-busy]="busyId() === notice.id">
+              <td [class.late]="isLate(notice)">{{ notice.expectedDate | date:'dd/MM/yy':'UTC' }}</td>
+              <td class="cell-strong">{{ notice.carrierCompany }}</td>
+              <td class="cell-title" [title]="notice.itemDescription ?? ''">{{ notice.itemDescription || '—' }}</td>
+              <td>{{ notice.tenantClientName }}</td>
+              <td>{{ notice.unitName }}</td>
+              <td>
+                <span class="status-pill" [class.open]="notice.state === 'Pending'" [class.muted]="notice.state === 'Cancelled'">
+                  {{ stateLabels[notice.state] }}
+                </span>
+              </td>
+              @if (activeTab() === 'received') {
+                <td>
+                  {{ notice.receivedAt | date:'dd/MM/yy HH:mm' }}
+                  @if (notice.receivedByName) {
+                    <span class="cell-sub">{{ notice.receivedByName }}</span>
+                  }
+                </td>
+              }
+              @if (activeTab() === 'pending') {
+                <td class="cell-actions">
+                  <button type="button" class="receive-btn" (click)="onReceive(notice)" [disabled]="busyId() !== null">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Recibido
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cards-mobile">
+      @for (notice of filteredNotices(); track notice.id) {
+        <div class="mobile-card static" [class.is-busy]="busyId() === notice.id">
+          <div class="mobile-top">
+            <span class="cell-strong">{{ notice.carrierCompany }}</span>
+            <span class="status-pill" [class.open]="notice.state === 'Pending'" [class.muted]="notice.state === 'Cancelled'">
+              {{ stateLabels[notice.state] }}
+            </span>
+          </div>
+          <span class="mobile-sub">
+            {{ notice.tenantClientName }} · {{ notice.unitName }} ·
+            <span [class.late]="isLate(notice)">llega {{ notice.expectedDate | date:'dd/MM/yy':'UTC' }}</span>
+          </span>
+          @if (notice.itemDescription) {
+            <p class="mobile-body">{{ notice.itemDescription }}</p>
+          }
+          @if (notice.state === 'Received' && notice.receivedAt) {
+            <span class="mobile-sub">
+              Recibido {{ notice.receivedAt | date:'dd/MM/yy HH:mm' }}
+              @if (notice.receivedByName) { · {{ notice.receivedByName }} }
+            </span>
+          }
+          @if (notice.state === 'Pending') {
+            <div class="mobile-actions">
+              <button type="button" class="mobile-action-btn" (click)="onReceive(notice)" [disabled]="busyId() !== null">
+                Marcar recibido
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

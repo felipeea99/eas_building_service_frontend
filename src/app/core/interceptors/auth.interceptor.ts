@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
-import { AuthService } from '../services/auth-service';
+import { AuthService } from '../services/auth/auth-service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
@@ -24,32 +24,108 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
     catchError((error: HttpErrorResponse) => {
 
-      // Access Token expirado
-      if (error.status === 401 && !req.url.includes('/api/auth/refresh')) {
-        return authService.refresh().pipe(
-          // Refresh exitoso
-          switchMap(() => {
-            const newAccessToken =
-              authService.getAccessToken()?.token;
+      // Solo manejar 401
+      if (
+        error.status !== 401 ||
+
+        // Nunca intentar refresh sobre login
+        req.url.includes('/api/auth/login') ||
+
+        // Nunca intentar refresh sobre refresh
+        req.url.includes('/api/auth/refresh')
+      ) {
+        return throwError(() => error);
+      }
+
+      // SI ESTA PETICIÓN YA FUE REINTENTADA
+
+      if (req.headers.has('X-Auth-Retry')) {
+
+        // El token nuevo tampoco funcionó.
+        // No volvemos a intentar refresh.
+        authService.clearAccessToken();
+
+        router.navigate(['/login']);
+
+        return throwError(() => error);
+      }
+
+
+      // YA HAY UN REFRESH EN PROCESO
+
+      if (authService.getIsRefreshing()) {
+
+        return authService.waitForRefresh().pipe(
+
+          switchMap((token) => {
 
             const retryRequest = req.clone({
               setHeaders: {
-                Authorization: `Bearer ${newAccessToken}`
+                Authorization: `Bearer ${token}`,
+                'X-Auth-Retry': 'true'
               }
             });
 
             return next(retryRequest);
           }),
 
-          // Refresh Token expirado/inválido
-          catchError(refreshError => {
+          catchError((refreshError) => {
+
             authService.clearAccessToken();
+
             router.navigate(['/login']);
+
             return throwError(() => refreshError);
           })
         );
       }
-      return throwError(() => error);
+
+
+      // NADIE ESTÁ HACIENDO REFRESH
+
+      authService.startRefreshing();
+
+      return authService.refresh().pipe(
+
+        switchMap(() => {
+
+          const newAccessToken =
+            authService.getAccessToken()?.token;
+
+          if (!newAccessToken) {
+
+            throw new Error(
+              'No se obtuvo Access Token después del refresh'
+            );
+          }
+
+          authService.finishRefreshing(
+            newAccessToken
+          );
+
+          const retryRequest = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${newAccessToken}`,
+              'X-Auth-Retry': 'true'
+            }
+          });
+
+          return next(retryRequest);
+        }),
+
+        catchError((refreshError) => {
+
+          authService.failRefreshing(
+            refreshError
+          );
+
+          authService.clearAccessToken();
+
+          router.navigate(['/login']);
+
+          return throwError(() => refreshError);
+        })
+      );
     })
   );
 };

@@ -1,0 +1,183 @@
+<div class="survey-editor">
+  @switch (step()) {
+    <!-- ═══ Paso 1: Datos ═══ -->
+    @case (0) {
+      <form [formGroup]="details" class="step" (submit)="$event.preventDefault()">
+        <div class="form-group" [class.invalid]="details.controls.title.touched && details.controls.title.invalid">
+          <label for="survey-title">Título</label>
+          <input id="survey-title" type="text" formControlName="title" [attr.maxlength]="limits.title"
+            placeholder="Ej. Satisfacción con el mantenimiento">
+          @if (details.controls.title.touched && details.controls.title.hasError('required')) {
+            <span class="error-msg">El título es obligatorio</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="survey-description">Descripción (opcional)</label>
+          <textarea id="survey-description" rows="3" formControlName="description" [attr.maxlength]="limits.description"
+            placeholder="Qué quieres saber y para qué"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="survey-starts">Abre (opcional)</label>
+            <input id="survey-starts" type="datetime-local" formControlName="startsAt">
+            <span class="hint">Vacío = abre al publicar</span>
+          </div>
+          <div class="form-group" [class.invalid]="!!datesError()">
+            <label for="survey-ends">Cierra (opcional)</label>
+            <input id="survey-ends" type="datetime-local" formControlName="endsAt">
+            @if (datesError(); as error) {
+              <span class="error-msg">{{ error }}</span>
+            } @else {
+              <span class="hint">Vacío = abierta hasta cerrarla</span>
+            }
+          </div>
+        </div>
+      </form>
+    }
+
+    <!-- ═══ Paso 2: Audiencia ═══ -->
+    @case (1) {
+      <div class="step">
+        <div class="audience-options">
+          <button type="button" class="audience-card" [class.active]="audience() === Audience.Building"
+            (click)="setAudience(Audience.Building)">
+            <span class="audience-title">Todo el edificio</span>
+            <span class="audience-desc">
+              @if (loadingClients()) { Calculando destinatarios... }
+              @else { {{ eligibleClients().length }} {{ eligibleClients().length === 1 ? 'cliente' : 'clientes' }} activos con acceso }
+            </span>
+          </button>
+          <button type="button" class="audience-card" [class.active]="audience() === Audience.SelectedClients"
+            (click)="setAudience(Audience.SelectedClients)">
+            <span class="audience-title">Clientes específicos</span>
+            <span class="audience-desc">Elige a quién enviarla</span>
+          </button>
+        </div>
+
+        <p class="hint">
+          Solo reciben encuestas los clientes activos, con cuenta y acceso al edificio. La lista final se fija al publicar.
+        </p>
+
+        @if (clientsError()) {
+          <div class="server-error">{{ clientsError() }}</div>
+        }
+
+        @if (audience() === Audience.SelectedClients) {
+          <div class="client-picker">
+            <div class="picker-head">
+              <input type="search" class="picker-search" placeholder="Buscar cliente..." (input)="onClientSearch($event)">
+              <button type="button" class="link-btn" (click)="selectAllFiltered()">Seleccionar todos</button>
+              <button type="button" class="link-btn" (click)="clearSelection()">Limpiar</button>
+            </div>
+
+            @if (loadingClients()) {
+              <div class="state-box"><div class="loading-spinner"></div></div>
+            } @else if (filteredClients().length === 0) {
+              <div class="state-box"><p>No hay clientes elegibles</p></div>
+            } @else {
+              <ul class="client-list">
+                @for (client of filteredClients(); track client.tenantClientId) {
+                  <li>
+                    <label class="client-row">
+                      <input type="checkbox" [checked]="isSelected(client.tenantClientId)"
+                        (change)="toggleClient(client.tenantClientId)">
+                      <span class="client-name">{{ client.name }}</span>
+                      <span class="client-email">{{ client.email }}</span>
+                    </label>
+                  </li>
+                }
+              </ul>
+            }
+
+            <div class="picker-foot">
+              <span>{{ selectedIds().size }} {{ selectedIds().size === 1 ? 'seleccionado' : 'seleccionados' }}</span>
+              @if (staleSelected() > 0) {
+                <span class="warn">{{ staleSelected() }} ya no son elegibles (quítalos antes de publicar)</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ═══ Paso 3: Preguntas ═══ -->
+    @case (2) {
+      <div class="step">
+        <ol class="question-list">
+          @for (question of questions.controls; track question; let i = $index) {
+            <li class="question-item" [formGroup]="question">
+              <div class="question-head">
+                <span class="question-number">{{ i + 1 }}</span>
+                <div class="question-tools">
+                  <button type="button" class="icon-btn" (click)="moveQuestion(i, -1)" [disabled]="i === 0" title="Subir">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                  </button>
+                  <button type="button" class="icon-btn" (click)="moveQuestion(i, 1)" [disabled]="i === questions.length - 1" title="Bajar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <button type="button" class="icon-btn danger" (click)="removeQuestion(i)" [disabled]="questions.length === 1" title="Quitar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group" [class.invalid]="question.controls.text.touched && question.controls.text.invalid">
+                <input type="text" formControlName="text" [attr.maxlength]="limits.questionText" placeholder="Escribe la pregunta">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <select formControlName="type" (change)="onTypeChange(question)">
+                    @for (option of typeOptions; track option.value) {
+                      <option [ngValue]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                </div>
+                <label class="check-field">
+                  <input type="checkbox" formControlName="isRequired">
+                  Obligatoria
+                </label>
+              </div>
+
+              @if (isChoice(question)) {
+                <div class="options" formArrayName="options">
+                  @for (option of question.controls.options.controls; track option; let j = $index) {
+                    <div class="option-row">
+                      <span class="option-bullet"></span>
+                      <input type="text" [formControlName]="j" [attr.maxlength]="limits.optionText" placeholder="Opción {{ j + 1 }}">
+                      <button type="button" class="icon-btn" (click)="removeOption(question, j)"
+                        [disabled]="question.controls.options.length <= 2" title="Quitar opción">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                      </button>
+                    </div>
+                  }
+                  <div class="options-foot">
+                    <button type="button" class="link-btn" (click)="addOption(question)"
+                      [disabled]="question.controls.options.length >= limits.options">+ Agregar opción</button>
+                    @if (optionsError(question); as error) {
+                      <span class="error-msg">{{ error }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </li>
+          }
+        </ol>
+
+        <button type="button" class="add-question" (click)="addQuestion()" [disabled]="questions.length >= limits.questions">
+          + Agregar pregunta
+        </button>
+      </div>
+    }
+  }
+</div>

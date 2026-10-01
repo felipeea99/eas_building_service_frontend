@@ -1,0 +1,107 @@
+<div class="reservable-space-schedule">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Horario de {{ spaceName() }}</h2>
+      <p>Define qué días y en qué horario se puede reservar (hora local del edificio)</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  @if (serverError()) {
+    <div class="server-error">{{ serverError() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="state-box">
+      <div class="loading-spinner"></div>
+      <p>Cargando horario...</p>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-fields">
+        <div class="form-group">
+          <label for="slotUnit">Se reserva</label>
+          <select id="slotUnit" formControlName="slotUnit" (change)="onSlotUnitChange()">
+            @for (u of slotUnits; track u.value) {
+              <option [ngValue]="u.value">{{ u.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group" [class.invalid]="form.controls.maxAdvanceDays.invalid && form.controls.maxAdvanceDays.touched">
+          <label for="maxAdvanceDays">Anticipación máxima (días)</label>
+          <input id="maxAdvanceDays" type="number" formControlName="maxAdvanceDays" min="0" max="365" />
+          @if (form.controls.maxAdvanceDays.invalid && form.controls.maxAdvanceDays.touched) {
+            <span class="error-msg">Entre 0 y 365 días</span>
+          }
+        </div>
+      </div>
+
+      @if (!isFullDay) {
+        <div class="form-fields">
+          <div class="form-group" [class.invalid]="form.controls.minSlots.invalid && form.controls.minSlots.touched">
+            <label for="minSlots">Mínimo de bloques por reservación</label>
+            <input id="minSlots" type="number" formControlName="minSlots" min="1" />
+            @if (form.controls.minSlots.invalid && form.controls.minSlots.touched) {
+              <span class="error-msg">Mínimo 1</span>
+            }
+          </div>
+          <div class="form-group" [class.invalid]="form.controls.maxSlots.invalid && form.controls.maxSlots.touched">
+            <label for="maxSlots">Máximo de bloques seguidos</label>
+            <input id="maxSlots" type="number" formControlName="maxSlots" min="1" placeholder="Sin límite" />
+            @if (form.controls.maxSlots.invalid && form.controls.maxSlots.touched) {
+              <span class="error-msg">Mínimo 1</span>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="days-section">
+        <div class="days-header">
+          <span class="days-title">Días y horario</span>
+          <button type="button" class="link-btn" (click)="copyMondayToOpenDays()">Copiar horario del lunes</button>
+        </div>
+
+        <div class="days-list" formArrayName="days">
+          @for (day of days.controls; track day.controls.dayOfWeek.value; let i = $index) {
+            <div class="day-row" [formGroupName]="i" [class.is-closed]="!day.controls.isOpen.value" [class.has-error]="dayError(i)">
+              <label class="day-toggle">
+                <input type="checkbox" formControlName="isOpen" />
+                <span class="day-name">{{ weekDays[i].label }}</span>
+              </label>
+
+              @if (day.controls.isOpen.value) {
+                <div class="day-times">
+                  <input type="time" formControlName="openTime" step="1800" aria-label="Apertura" />
+                  <span class="time-sep">a</span>
+                  <input type="time" formControlName="closeTime" step="1800" aria-label="Cierre" />
+                </div>
+              } @else {
+                <span class="day-closed">Cerrado</span>
+              }
+
+              @if (dayError(i); as error) {
+                <span class="day-hint error">{{ error }}</span>
+              } @else if (dayPreview(i); as preview) {
+                <span class="day-hint">{{ preview }}</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="submit-btn" [disabled]="isSubmitting()" [class.loading]="isSubmitting()">
+          <span class="btn-label">Guardar horario</span>
+          <span class="btn-spinner"></span>
+        </button>
+      </div>
+    </form>
+  }
+</div>

@@ -5,7 +5,23 @@
   <title>EASServicesBuildingFrontEnd</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script>
+    // Aplica el tema (claro/oscuro) antes de que Angular arranque,
+    // para evitar el parpadeo de tema incorrecto al cargar la página.
+    (function () {
+      try {
+        var stored = localStorage.getItem('eas-theme');
+        var theme = (stored === 'light' || stored === 'dark')
+          ? stored
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        // localStorage no disponible (modo privado, etc.): se queda en el default de CSS
+      }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

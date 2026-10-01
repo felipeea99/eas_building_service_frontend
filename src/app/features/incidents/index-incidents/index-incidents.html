@@ -1,0 +1,231 @@
+<div class="incidents-page">
+  <div class="page-header">
+    <h1>Incidencias</h1>
+    <p>
+      @if (activeTab() === 'summary') {
+        {{ totalCount() }} {{ totalCount() === 1 ? 'cliente' : 'clientes' }} con incidencias
+      } @else {
+        {{ filteredIncidents().length }} de {{ totalCount() }} incidencias
+      }
+    </p>
+  </div>
+
+  <div class="tabs">
+    <button type="button" class="tab" [class.active]="activeTab() === 'summary'" (click)="setTab('summary')">Morosos</button>
+    <button type="button" class="tab" [class.active]="activeTab() === 'list'" (click)="setTab('list')">Incidencias</button>
+  </div>
+
+  @if (activeTab() === 'summary') {
+    <app-toolbar
+      placeholder="Buscar cliente..."
+      [filters]="summaryFilters"
+      addLabel="Registrar incidencia"
+      (search)="onSearch($event)"
+      (filterChange)="onFilterChange($event)"
+      (addClick)="onAdd()"
+    />
+  } @else {
+    <app-toolbar
+      placeholder="Buscar por cliente, título o descripción..."
+      [filters]="listFilters"
+      addLabel="Registrar incidencia"
+      (search)="onSearch($event)"
+      (filterChange)="onFilterChange($event)"
+      (addClick)="onAdd()"
+    />
+  }
+
+  @if (isLoading()) {
+    <div class="page-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando...</p>
+    </div>
+  } @else if (activeTab() === 'summary') {
+    <!-- ═══ Morosos ═══ -->
+    @if (filteredSummary().length === 0) {
+      <div class="page-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <p>{{ summary().length ? 'Sin resultados' : 'Ningún cliente con incidencias abiertas' }}</p>
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th class="align-right">Abiertas</th>
+              <th class="align-right">Total</th>
+              <th class="align-right">Monto abierto</th>
+              <th>Categorías</th>
+              <th>Última</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of filteredSummary(); track row.tenantClientId) {
+              <tr class="data-row clickable-row" (click)="openClient(row)">
+                <td class="cell-strong">
+                  {{ row.tenantClientName }}
+                  <span class="cell-sub">{{ row.phoneNumber }}</span>
+                </td>
+                <td class="align-right">
+                  <span class="count" [class.warn]="row.openIncidents > 0">{{ row.openIncidents }}</span>
+                </td>
+                <td class="align-right">{{ row.totalIncidents }}</td>
+                <td class="align-right cell-amount">
+                  @if (row.openAmount > 0) { ${{ row.openAmount | number:'1.2-2' }} } @else { — }
+                </td>
+                <td class="cell-chips">
+                  @for (count of row.byCategory; track count.categoryValue) {
+                    <span class="chip" [class.has-open]="count.open > 0" [title]="count.open + ' abiertas de ' + count.total">
+                      {{ count.label }} · {{ count.total }}
+                    </span>
+                  }
+                </td>
+                <td>{{ row.lastOccurredAt | date:'dd/MM/yy':'UTC' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cards-mobile">
+        @for (row of filteredSummary(); track row.tenantClientId) {
+          <button type="button" class="mobile-card" (click)="openClient(row)">
+            <div class="mobile-top">
+              <span class="cell-strong">{{ row.tenantClientName }}</span>
+              <span class="count" [class.warn]="row.openIncidents > 0">{{ row.openIncidents }} abiertas</span>
+            </div>
+            <span class="mobile-sub">
+              {{ row.totalIncidents }} en total · última {{ row.lastOccurredAt | date:'dd/MM/yy':'UTC' }}
+              @if (row.openAmount > 0) { · ${{ row.openAmount | number:'1.2-2' }} }
+            </span>
+            <div class="cell-chips">
+              @for (count of row.byCategory; track count.categoryValue) {
+                <span class="chip" [class.has-open]="count.open > 0">{{ count.label }} · {{ count.total }}</span>
+              }
+            </div>
+          </button>
+        }
+      </div>
+    }
+  } @else {
+    <!-- ═══ Incidencias ═══ -->
+    @if (filteredIncidents().length === 0) {
+      <div class="page-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        </svg>
+        <p>No se encontraron incidencias</p>
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Incidencia</th>
+              <th>Unidad</th>
+              <th class="align-right">Monto</th>
+              <th>Estado</th>
+              <th>Registró</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (incident of filteredIncidents(); track incident.id) {
+              <tr class="data-row" [class.is-busy]="busyId() === incident.id">
+                <td>{{ incident.occurredAt | date:'dd/MM/yy':'UTC' }}</td>
+                <td>
+                  <button type="button" class="client-link" (click)="openClient(incident)" title="Historial del cliente">
+                    {{ incident.tenantClientName }}
+                  </button>
+                </td>
+                <td class="cell-title" [title]="incident.description">
+                  <span class="cell-strong">{{ incident.title }}</span>
+                  @if (incident.category === 'Otro') {
+                    <span class="cell-sub">Otro</span>
+                  }
+                </td>
+                <td>{{ incident.unitNumber ?? '—' }}</td>
+                <td class="align-right cell-amount">
+                  @if (incident.amount !== null) { ${{ incident.amount | number:'1.2-2' }} } @else { — }
+                </td>
+                <td>
+                  <span class="status-pill" [class.open]="!incident.isResolved"
+                    [title]="incident.isResolved && incident.resolutionNotes ? incident.resolutionNotes : ''">
+                    {{ incident.isResolved ? 'Resuelta' : 'Abierta' }}
+                  </span>
+                </td>
+                <td>{{ incident.createdByName ?? '—' }}</td>
+                <td class="cell-actions">
+                  <button type="button" class="row-action-btn" (click)="edit(incident)" [disabled]="busyId() !== null" title="Editar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>
+                    </svg>
+                  </button>
+                  @if (incident.isResolved) {
+                    <button type="button" class="row-action-btn" (click)="reopen(incident)" [disabled]="busyId() !== null" title="Reabrir">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                      </svg>
+                    </button>
+                  } @else {
+                    <button type="button" class="row-action-btn action-ok" (click)="resolve(incident)" [disabled]="busyId() !== null" title="Resolver">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </button>
+                  }
+                  @if (canVoid) {
+                    <button type="button" class="row-action-btn action-danger" (click)="voidIncident(incident)" [disabled]="busyId() !== null" title="Anular">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                      </svg>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cards-mobile">
+        @for (incident of filteredIncidents(); track incident.id) {
+          <div class="mobile-card static" [class.is-busy]="busyId() === incident.id">
+            <div class="mobile-top">
+              <span class="cell-strong">{{ incident.title }}</span>
+              <span class="status-pill" [class.open]="!incident.isResolved">{{ incident.isResolved ? 'Resuelta' : 'Abierta' }}</span>
+            </div>
+            <span class="mobile-sub">
+              {{ incident.tenantClientName }} · {{ incident.occurredAt | date:'dd/MM/yy':'UTC' }}
+              @if (incident.unitNumber) { · Unidad {{ incident.unitNumber }} }
+              @if (incident.amount !== null) { · ${{ incident.amount | number:'1.2-2' }} }
+            </span>
+            <p class="mobile-body">{{ incident.description }}</p>
+            <div class="mobile-actions">
+              <button type="button" class="mobile-action-btn" (click)="edit(incident)" [disabled]="busyId() !== null">Editar</button>
+              @if (incident.isResolved) {
+                <button type="button" class="mobile-action-btn" (click)="reopen(incident)" [disabled]="busyId() !== null">Reabrir</button>
+              } @else {
+                <button type="button" class="mobile-action-btn" (click)="resolve(incident)" [disabled]="busyId() !== null">Resolver</button>
+              }
+              @if (canVoid) {
+                <button type="button" class="mobile-action-btn action-danger" (click)="voidIncident(incident)" [disabled]="busyId() !== null">Anular</button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

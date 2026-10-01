@@ -1,0 +1,145 @@
+<div class="register-user">
+  <div class="form-head">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="head-icon">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+    </svg>
+    <h2>Crear usuario</h2>
+    <p>Registra los datos del nuevo usuario y asígnale un rol dentro del edificio</p>
+  </div>
+
+  @if (serverError()) {
+    <div class="server-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+      </svg>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <!-- Nombre / Segundo nombre -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="registerForm.controls.firstName.invalid && registerForm.controls.firstName.touched">
+        <label for="firstName">Nombre</label>
+        <input type="text" id="firstName" formControlName="firstName" placeholder="Juan" autocomplete="given-name">
+        @if (registerForm.controls.firstName.invalid && registerForm.controls.firstName.touched) {
+          <span class="error-msg">El nombre es requerido</span>
+        }
+      </div>
+      <div class="form-group">
+        <label for="middleName">Segundo nombre <span class="optional-tag">(opcional)</span></label>
+        <input type="text" id="middleName" formControlName="middleName" placeholder="Alberto" autocomplete="additional-name">
+      </div>
+    </div>
+
+    <!-- Apellidos -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="registerForm.controls.lastName.invalid && registerForm.controls.lastName.touched">
+        <label for="lastName">Apellido paterno</label>
+        <input type="text" id="lastName" formControlName="lastName" placeholder="Pérez" autocomplete="family-name">
+        @if (registerForm.controls.lastName.invalid && registerForm.controls.lastName.touched) {
+          <span class="error-msg">El apellido es requerido</span>
+        }
+      </div>
+      <div class="form-group">
+        <label for="secondLastName">Apellido materno <span class="optional-tag">(opcional)</span></label>
+        <input type="text" id="secondLastName" formControlName="secondLastName" placeholder="García" autocomplete="family-name">
+      </div>
+    </div>
+
+    <!-- Email / Teléfono -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="registerForm.controls.email.invalid && registerForm.controls.email.touched">
+        <label for="email">Email</label>
+        <input type="email" id="email" formControlName="email" placeholder="tu@correo.com" autocomplete="email">
+        @if (registerForm.controls.email.invalid && registerForm.controls.email.touched) {
+          <span class="error-msg">Email inválido</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="registerForm.controls.phoneNumber.invalid && registerForm.controls.phoneNumber.touched">
+        <label for="phoneNumber">Teléfono</label>
+        <input type="tel" id="phoneNumber" formControlName="phoneNumber" placeholder="8112345678" autocomplete="tel">
+        @if (registerForm.controls.phoneNumber.invalid && registerForm.controls.phoneNumber.touched) {
+          <span class="error-msg">Ingresa un teléfono válido a 10 dígitos</span>
+        }
+      </div>
+    </div>
+
+    <!-- Contraseña temporal -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="registerForm.controls.temporaryPassword.invalid && registerForm.controls.temporaryPassword.touched">
+        <label for="temporaryPassword">Contraseña temporal</label>
+        <div class="password-wrap">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            id="temporaryPassword"
+            formControlName="temporaryPassword"
+            placeholder="••••••••"
+            autocomplete="new-password"
+          >
+          <button type="button" class="toggle-visibility" (click)="showPassword.set(!showPassword())" aria-label="Mostrar contraseña">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/></svg>
+          </button>
+        </div>
+        @if (registerForm.controls.temporaryPassword.invalid && registerForm.controls.temporaryPassword.touched) {
+          <div class="password-errors">
+            @for (entry of passwordErrors | keyvalue; track entry.key) {
+              @if (registerForm.controls.temporaryPassword.hasError(entry.key)) {
+                <span class="error-msg">{{ entry.value }}</span>
+              }
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Edificio / Rol -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="registerForm.controls.buildingId.invalid && registerForm.controls.buildingId.touched">
+        <label for="buildingId">Edificio</label>
+        <select id="buildingId" formControlName="buildingId">
+          <option value="" disabled>Selecciona un edificio</option>
+          @for (building of buildings(); track building.buildingId) {
+            <option [value]="building.buildingId">{{ building.buildingName }}</option>
+          }
+        </select>
+        @if (registerForm.controls.buildingId.invalid && registerForm.controls.buildingId.touched) {
+          <span class="error-msg">Selecciona un edificio</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="registerForm.controls.role.invalid && registerForm.controls.role.touched">
+        <label for="role">Rol</label>
+        <select id="role" formControlName="role">
+          @for (roleOption of selectableRoles; track roleOption.value) {
+            <option [ngValue]="roleOption.value">{{ roleOption.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Empresa / RFC -->
+    <div class="form-fields">
+      <div class="form-group">
+        <label for="companyName">Empresa <span class="optional-tag">(opcional)</span></label>
+        <input type="text" id="companyName" formControlName="companyName" placeholder="Mi Empresa S.A." autocomplete="organization">
+      </div>
+      <div class="form-group" [class.invalid]="registerForm.controls.rfc.invalid && registerForm.controls.rfc.touched">
+        <label for="rfc">RFC <span class="optional-tag">(opcional)</span></label>
+        <input type="text" id="rfc" formControlName="rfc" placeholder="XAXX010101000">
+        @if (registerForm.controls.rfc.invalid && registerForm.controls.rfc.touched) {
+          <span class="error-msg">El RFC no tiene un formato válido</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()">
+        <span class="btn-label">Crear usuario</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

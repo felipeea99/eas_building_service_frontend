@@ -1,0 +1,89 @@
+<div class="edit-tenant-client">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Editar cliente</h2>
+      <p>Modifica los datos del cliente</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Nombre y Segundo nombre -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.firstName.invalid && form.controls.firstName.touched">
+        <label for="etc-firstName">Nombre *</label>
+        <input type="text" id="etc-firstName" formControlName="firstName" placeholder="Juan">
+        @if (form.controls.firstName.invalid && form.controls.firstName.touched) {
+          <span class="error-msg">El nombre es requerido</span>
+        }
+      </div>
+      <div class="form-group">
+        <label for="etc-middleName">Segundo nombre</label>
+        <input type="text" id="etc-middleName" formControlName="middleName" placeholder="Carlos">
+      </div>
+    </div>
+
+    <!-- Apellido paterno y materno -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.lastName.invalid && form.controls.lastName.touched">
+        <label for="etc-lastName">Apellido paterno *</label>
+        <input type="text" id="etc-lastName" formControlName="lastName" placeholder="Pérez">
+        @if (form.controls.lastName.invalid && form.controls.lastName.touched) {
+          <span class="error-msg">El apellido es requerido</span>
+        }
+      </div>
+      <div class="form-group">
+        <label for="etc-secondLastName">Apellido materno</label>
+        <input type="text" id="etc-secondLastName" formControlName="secondLastName" placeholder="López">
+      </div>
+    </div>
+
+    <!-- Email y Teléfono -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.email.invalid && form.controls.email.touched">
+        <label for="etc-email">Email *</label>
+        <input type="email" id="etc-email" formControlName="email" placeholder="juan@ejemplo.com">
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <span class="error-msg">Ingresa un email válido</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched">
+        <label for="etc-phone">Teléfono *</label>
+        <input type="tel" id="etc-phone" formControlName="phoneNumber" placeholder="55 1234 5678">
+        @if (form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) {
+          <span class="error-msg">Ingresa 10 dígitos numéricos</span>
+        }
+      </div>
+    </div>
+
+    <!-- Empresa y RFC -->
+    <div class="form-fields">
+      <div class="form-group">
+        <label for="etc-company">Empresa</label>
+        <input type="text" id="etc-company" formControlName="companyName" placeholder="Mi Empresa S.A.">
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.rfc.invalid && form.controls.rfc.touched">
+        <label for="etc-rfc">RFC</label>
+        <input type="text" id="etc-rfc" formControlName="rfc" placeholder="XAXX010101000">
+        @if (form.controls.rfc.invalid && form.controls.rfc.touched) {
+          <span class="error-msg">RFC inválido</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isSubmitting()" [disabled]="isSubmitting()">
+        <span class="btn-label">Guardar cambios</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

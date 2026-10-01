@@ -1,0 +1,160 @@
+<div class="parking-spots-page">
+  <div class="spots-header">
+    <div class="header-left">
+      <h1>Estacionamientos</h1>
+      <p>{{ filteredSpots().length }} de {{ spots().length }} espacios</p>
+    </div>
+  </div>
+
+  <app-toolbar
+    placeholder="Buscar por número, inquilino o unidad..."
+    [filters]="toolbarFilters"
+    addLabel="Nuevo espacio"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+    (addClick)="modalService.open('create-parking-spot', { buildingId: buildingId })"
+  />
+
+  @if (isLoading()) {
+    <div class="spots-loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando estacionamientos...</p>
+    </div>
+  } @else if (filteredSpots().length === 0) {
+    <div class="spots-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"/>
+        <circle cx="5.5" cy="18" r="2"/><circle cx="18.5" cy="18" r="2"/>
+      </svg>
+      <p>No se encontraron estacionamientos</p>
+    </div>
+  } @else {
+    <!-- Table desktop -->
+    <div class="spots-table-wrapper">
+      <table class="spots-table">
+        <thead>
+          <tr>
+            <th>Espacio</th>
+            <th class="align-right">Tarifa</th>
+            <th>Inquilino</th>
+            <th>Unidad</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (spot of filteredSpots(); track spot.spotNumber) {
+            <tr class="spot-row">
+              <td class="cell-spot">{{ spot.spotNumber }}</td>
+              <td class="cell-rate align-right">
+                @if (spot.hasMonthlyRate) {
+                  ${{ spot.monthlyRate | number:'1.2-2' }}
+                } @else {
+                  <span class="no-rate">—</span>
+                }
+              </td>
+              <td class="cell-tenant">{{ spot.isAssigned && spot.tenantClientFullName ? spot.tenantClientFullName : '—' }}</td>
+              <td>{{ spot.isAssigned && spot.unitName ? spot.unitName : '—' }}</td>
+              <td>
+                <span class="spot-status" [class.is-assigned]="spot.isAssigned">
+                  {{ spot.isAssigned ? 'Asignado' : 'Disponible' }}
+                </span>
+              </td>
+              <td class="cell-action">
+                <app-card-menu
+                  [actions]="getMenuActions(spot)"
+                  (actionClick)="onMenuAction($event, spot)"
+                />
+              </td>
+            </tr>
+            @if (assigningSpotId() === spot.parkingSpotId) {
+              <tr class="assign-row">
+                <td colspan="6">
+                  <div class="assign-form">
+                    <div class="form-group">
+                      <label>Seleccionar inquilino</label>
+                      <select (change)="selectedTenantId.set(asInputValue($event))">
+                        <option value="">-- Selecciona --</option>
+                        @for (tenant of tenants(); track tenant.id) {
+                          <option [value]="tenant.id">{{ tenant.fullName }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="form-actions">
+                      <button class="btn-cancel" (click)="closeAssignForm()">Cancelar</button>
+                      <button class="btn-save" [disabled]="isAssigning()" (click)="confirmAssign(spot)">
+                        {{ isAssigning() ? 'Asignando...' : 'Asignar' }}
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards mobile -->
+    <div class="spots-cards-mobile">
+      @for (spot of filteredSpots(); track spot.spotNumber) {
+        <div class="mobile-card" [class.assigned]="spot.isAssigned">
+          <div class="mobile-card-header">
+            <div class="mobile-top-left">
+              <span class="mobile-spot-number">{{ spot.spotNumber }}</span>
+              <span class="spot-status" [class.is-assigned]="spot.isAssigned">
+                {{ spot.isAssigned ? 'Asignado' : 'Disponible' }}
+              </span>
+            </div>
+            <app-card-menu
+              [actions]="getMenuActions(spot)"
+              (actionClick)="onMenuAction($event, spot)"
+            />
+          </div>
+          <div class="mobile-card-body">
+            <div class="mobile-detail">
+              <span class="mobile-label">Tarifa</span>
+              <span class="mobile-value" [class.rate]="spot.hasMonthlyRate">
+                @if (spot.hasMonthlyRate) {
+                  ${{ spot.monthlyRate | number:'1.2-2' }} / mes
+                } @else {
+                  Sin tarifa
+                }
+              </span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Inquilino</span>
+              <span class="mobile-value">{{ spot.isAssigned && spot.tenantClientFullName ? spot.tenantClientFullName : '—' }}</span>
+            </div>
+            @if (spot.isAssigned && spot.unitName) {
+              <div class="mobile-detail">
+                <span class="mobile-label">Unidad</span>
+                <span class="mobile-value">{{ spot.unitName }}</span>
+              </div>
+            }
+          </div>
+          @if (assigningSpotId() === spot.parkingSpotId) {
+            <div class="assign-form">
+              <div class="form-group">
+                <label>Seleccionar inquilino</label>
+                <select (change)="selectedTenantId.set(asInputValue($event))">
+                  <option value="">-- Selecciona --</option>
+                  @for (tenant of tenants(); track tenant.id) {
+                    <option [value]="tenant.id">{{ tenant.fullName }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-actions">
+                <button class="btn-cancel" (click)="closeAssignForm()">Cancelar</button>
+                <button class="btn-save" [disabled]="isAssigning()" (click)="confirmAssign(spot)">
+                  {{ isAssigning() ? 'Asignando...' : 'Asignar' }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,115 @@
+/* ============================================================
+   Follow-ups Widget — Inicio (seguimientos de la bitácora)
+   ============================================================ */
+
+:host {
+  display: block;
+  font-family: Arial, sans-serif;
+}
+
+.follow-ups-widget {
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.widget-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: .6rem;
+}
+
+.widget-title {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: var(--color-warning);
+}
+
+.widget-title h2 {
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.count-badge {
+  font-size: .7rem;
+  font-weight: 700;
+  padding: .12rem .5rem;
+  border-radius: 20px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.see-all {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+.see-all:hover {
+  text-decoration: underline;
+}
+
+.widget-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.widget-list li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.widget-row {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  width: 100%;
+  padding: .55rem .25rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  border-radius: 8px;
+  transition: background .12s ease;
+}
+
+.widget-row:hover {
+  background: var(--color-bg);
+}
+
+.row-date {
+  width: 44px;
+  flex-shrink: 0;
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--color-warning);
+}
+
+.row-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.row-client {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.row-body {
+  font-size: .78rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

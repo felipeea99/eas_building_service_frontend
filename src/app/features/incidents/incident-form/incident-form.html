@@ -1,0 +1,133 @@
+<div class="incident-form">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>{{ editing() ? 'Editar incidencia' : 'Registrar incidencia' }}</h2>
+      <p>Registro formal en el historial del inquilino</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Cliente -->
+    @if (fixedClientName() !== null) {
+      <div class="fixed-field">
+        <span class="fixed-label">Inquilino</span>
+        <span class="fixed-value">{{ fixedClientName() || 'Inquilino' }}</span>
+        @if (editing()?.unitNumber) {
+          <span class="fixed-sub">Unidad {{ editing()!.unitNumber }}</span>
+        }
+      </div>
+    } @else {
+      <div class="form-group full-width"
+        [class.invalid]="form.controls.tenantClientId.touched && form.controls.tenantClientId.invalid">
+        <label for="incident-client">Inquilino</label>
+        <select id="incident-client" formControlName="tenantClientId">
+          <option value="">{{ loadingClients() ? 'Cargando...' : 'Selecciona un inquilino' }}</option>
+          @for (client of clients(); track client.id) {
+            <option [value]="client.id">{{ client.displayName }}</option>
+          }
+        </select>
+        @if (form.controls.tenantClientId.touched && form.controls.tenantClientId.invalid) {
+          <span class="error-msg">Selecciona el inquilino</span>
+        }
+      </div>
+    }
+
+    <div class="form-fields">
+      <!-- Contrato (solo al crear) -->
+      @if (!editing()) {
+        <div class="form-group">
+          <label for="incident-contract">Contrato (opcional)</label>
+          <select id="incident-contract" formControlName="unitContractId">
+            <option value="">{{ loadingContracts() ? 'Cargando...' : 'Sin contrato' }}</option>
+            @for (contract of contracts(); track contract.id) {
+              <option [value]="contract.id">{{ getContractLabel(contract) }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="incident-category">Categoría</label>
+        <select id="incident-category" formControlName="category">
+          @for (option of categoryOptions; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (isOther) {
+      <div class="form-group full-width"
+        [class.invalid]="form.controls.otherTitle.touched && form.controls.otherTitle.invalid">
+        <label for="incident-title">¿Qué pasó? (título)</label>
+        <input id="incident-title" type="text" formControlName="otherTitle" [attr.maxlength]="limits.otherTitle"
+          placeholder="Ej. Mascota suelta en pasillos">
+        @if (form.controls.otherTitle.touched && form.controls.otherTitle.hasError('required')) {
+          <span class="error-msg">Especifica la situación</span>
+        }
+      </div>
+    }
+
+    <div class="form-fields">
+      <div class="form-group"
+        [class.invalid]="form.controls.occurredAt.touched && form.controls.occurredAt.invalid">
+        <label for="incident-date">Fecha</label>
+        <input id="incident-date" type="date" formControlName="occurredAt" [max]="maxDate">
+        @if (form.controls.occurredAt.touched && form.controls.occurredAt.invalid) {
+          <span class="error-msg">Indica la fecha</span>
+        }
+      </div>
+      <div class="form-group"
+        [class.invalid]="form.controls.amount.touched && form.controls.amount.invalid">
+        <label for="incident-amount">Monto (opcional)</label>
+        <input id="incident-amount" type="number" min="0" step="0.01" formControlName="amount" placeholder="0.00">
+        @if (form.controls.amount.touched && form.controls.amount.invalid) {
+          <span class="error-msg">No puede ser negativo</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-group full-width"
+      [class.invalid]="form.controls.description.touched && form.controls.description.invalid">
+      <label for="incident-description">Descripción</label>
+      <textarea id="incident-description" rows="4" formControlName="description" [attr.maxlength]="limits.description"
+        placeholder="Describe lo que ocurrió"></textarea>
+      <div class="field-foot">
+        @if (form.controls.description.touched && form.controls.description.hasError('required')) {
+          <span class="error-msg">La descripción es obligatoria</span>
+        } @else {
+          <span></span>
+        }
+        <span class="chars-left">{{ descriptionCharsLeft }}</span>
+      </div>
+    </div>
+
+    @if (editing()?.isResolved) {
+      <div class="info-box">
+        Resuelta el {{ editing()!.resolvedAt | date:'dd/MM/yy' }}
+        @if (editing()!.amount !== null) { · monto {{ editing()!.amount | number:'1.2-2' }} }
+      </div>
+    }
+
+    @if (serverError()) {
+      <div class="server-error">{{ serverError() }}</div>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="ghost-btn" (click)="cancel()" [disabled]="isSubmitting()">Cancelar</button>
+      <button type="submit" class="submit-btn" [class.loading]="isSubmitting()" [disabled]="isSubmitting()">
+        <span class="btn-label">{{ editing() ? 'Guardar cambios' : 'Registrar' }}</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

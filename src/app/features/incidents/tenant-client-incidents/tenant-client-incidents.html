@@ -1,0 +1,64 @@
+<div class="tenant-client-incidents">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Incidencias de {{ tenantClientName() || 'inquilino' }}</h2>
+      @if (!isLoading() && !loadError()) {
+        <p>{{ totalCount() }} {{ totalCount() === 1 ? 'registro' : 'registros' }} · {{ openCount() }} {{ openCount() === 1 ? 'abierta' : 'abiertas' }}</p>
+      } @else {
+        <p>Historial de incidencias</p>
+      }
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  @if (isLoading()) {
+    <div class="state-box">
+      <div class="loading-spinner"></div>
+      <p>Cargando incidencias...</p>
+    </div>
+  } @else if (loadError()) {
+    <div class="server-error">{{ loadError() }}</div>
+  } @else if (incidents().length === 0) {
+    <div class="state-box">
+      <p>Este inquilino no tiene incidencias registradas</p>
+    </div>
+  } @else {
+    <ul class="incident-list">
+      @for (incident of incidents(); track incident.id) {
+        <li class="incident-item" [class.is-open]="!incident.isResolved">
+          <div class="item-top">
+            <span class="item-title">{{ incident.title }}</span>
+            <span class="status-pill" [class.open]="!incident.isResolved">
+              {{ incident.isResolved ? 'Resuelta' : 'Abierta' }}
+            </span>
+          </div>
+          <span class="item-meta">
+            {{ incident.occurredAt | date:'dd/MM/yy':'UTC' }}
+            @if (incident.category === 'Otro') { · {{ incident.categoryLabel }} }
+            @if (incident.buildingName) { · {{ incident.buildingName }} }
+            @if (incident.unitNumber) { · Unidad {{ incident.unitNumber }} }
+            @if (incident.amount !== null) { · ${{ incident.amount | number:'1.2-2' }} }
+          </span>
+          <p class="item-description">{{ incident.description }}</p>
+          @if (incident.isResolved && incident.resolutionNotes) {
+            <p class="item-resolution">Resolución: {{ incident.resolutionNotes }}</p>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="form-actions">
+    <button type="button" class="submit-btn" (click)="registerIncident()" [disabled]="isLoading()">
+      <span class="btn-label">Registrar incidencia</span>
+    </button>
+  </div>
+</div>

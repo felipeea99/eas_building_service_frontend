@@ -1,0 +1,95 @@
+<div class="create-visit">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Autorizar visita</h2>
+      <p>Completa la información para registrar una nueva visita autorizada</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  @if (serverError()) {
+    <div class="server-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+      </svg>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Edificio -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="form.controls.buildingId.invalid && form.controls.buildingId.touched">
+        <label for="av-buildingId">Edificio</label>
+        <select id="av-buildingId" formControlName="buildingId">
+          <option value="" disabled>Selecciona un edificio</option>
+          @for (building of buildings(); track building.id) {
+            <option [value]="building.id">{{ building.name }}</option>
+          }
+        </select>
+        @if (form.controls.buildingId.invalid && form.controls.buildingId.touched) {
+          <span class="error-msg">Selecciona un edificio</span>
+        }
+      </div>
+    </div>
+
+    <!-- Nombre del visitante -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="form.controls.visitorName.invalid && form.controls.visitorName.touched">
+        <label for="av-visitorName">Nombre del visitante</label>
+        <input id="av-visitorName" type="text" formControlName="visitorName" placeholder="Ej: Juan Pérez" />
+        @if (form.controls.visitorName.invalid && form.controls.visitorName.touched) {
+          <span class="error-msg">Ingresa el nombre del visitante</span>
+        }
+      </div>
+    </div>
+
+    <!-- Teléfono y Propósito -->
+    <div class="form-fields">
+      <div class="form-group">
+        <label for="av-visitorPhone">Teléfono (opcional)</label>
+        <input id="av-visitorPhone" type="tel" formControlName="visitorPhone" placeholder="Ej: 55 1234 5678" />
+      </div>
+      <div class="form-group">
+        <label for="av-purpose">Propósito (opcional)</label>
+        <input id="av-purpose" type="text" formControlName="purpose" placeholder="Ej: Entrega de paquete" />
+      </div>
+    </div>
+
+    <!-- Válido desde / hasta -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.validFrom.invalid && form.controls.validFrom.touched">
+        <label for="av-validFrom">Válido desde</label>
+        <input id="av-validFrom" type="datetime-local" formControlName="validFrom" />
+        @if (form.controls.validFrom.invalid && form.controls.validFrom.touched) {
+          <span class="error-msg">Requerido</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.validUntil.invalid && form.controls.validUntil.touched">
+        <label for="av-validUntil">Válido hasta</label>
+        <input id="av-validUntil" type="datetime-local" formControlName="validUntil" />
+        @if (form.controls.validUntil.invalid && form.controls.validUntil.touched) {
+          <span class="error-msg">Requerido</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()">
+        <span class="btn-label">Autorizar visita</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

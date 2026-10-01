@@ -1,0 +1,157 @@
+<div class="landing">
+
+  <!-- ── Top bar ── -->
+  <header class="landing-topbar">
+    <img src="/EAS_BLACK_LOGO.png" alt="EAS" class="landing-logo app-logo">
+    <div class="landing-topbar-actions">
+      <app-theme-toggle />
+      <a routerLink="/login" class="topbar-link clickable">Iniciar sesión</a>
+      <a routerLink="/create-account" class="topbar-cta clickable">Comenzar</a>
+    </div>
+  </header>
+
+  <!-- ── Portada ── -->
+  <section class="scene scene-cover">
+    <span class="scene-eyebrow anim">EAS Services Building</span>
+    <h1 class="scene-display anim">
+      <span class="gradient-text">Administra tus</span><br>edificios sin esfuerzo
+    </h1>
+    <p class="scene-subtitle anim">Una sola plataforma para unidades, inquilinos, contratos,<br>estacionamiento, visitas y reservaciones.</p>
+    <div class="scene-actions anim">
+      <a routerLink="/create-account" class="btn-primary clickable">Crear cuenta</a>
+      <a routerLink="/login" class="btn-ghost clickable">Ya tengo cuenta
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Feature Cards ── -->
+  <section class="cards-section">
+
+    <!-- Edificios — full width, dark -->
+    <div class="card card-dark card-full">
+      <div class="card-content">
+        <h2>Edificios</h2>
+        <p>Dashboard dedicado. Ocupación, módulos y estado general en una vista.</p>
+        <div class="card-actions">
+          <a routerLink="/login" class="card-btn card-btn-light clickable">Más información</a>
+          <a routerLink="/create-account" class="card-btn card-btn-outline-light clickable">Comenzar</a>
+        </div>
+      </div>
+      <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&q=80" alt="Edificios" class="card-img">
+    </div>
+
+    <!-- Unidades — full width, surface -->
+    <div class="card card-surface card-full">
+      <div class="card-content">
+        <h2>Unidades</h2>
+        <p>Control preciso de cada departamento, local y oficina.</p>
+        <div class="card-actions">
+          <a routerLink="/login" class="card-btn card-btn-dark clickable">Más información</a>
+          <a routerLink="/create-account" class="card-btn card-btn-outline-dark clickable">Comenzar</a>
+        </div>
+      </div>
+      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=80" alt="Unidades" class="card-img">
+    </div>
+
+    <!-- Inquilinos — full width, surface -->
+    <div class="card card-surface card-full">
+      <div class="card-content">
+        <h2>Inquilinos</h2>
+        <p>Alta, baja y seguimiento. Vinculación de cuentas en tiempo real.</p>
+        <div class="card-actions">
+          <a routerLink="/login" class="card-btn card-btn-dark clickable">Más información</a>
+          <a routerLink="/create-account" class="card-btn card-btn-outline-dark clickable">Comenzar</a>
+        </div>
+      </div>
+      <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80" alt="Inquilinos" class="card-img">
+    </div>
+
+    <!-- Contratos — full width, dark -->
+    <div class="card card-dark card-full">
+      <div class="card-content">
+        <h2>Contratos</h2>
+        <p>Registro, vigencia y documentación centralizada por edificio.</p>
+        <div class="card-actions">
+          <a routerLink="/login" class="card-btn card-btn-light clickable">Más información</a>
+          <a routerLink="/create-account" class="card-btn card-btn-outline-light clickable">Comenzar</a>
+        </div>
+      </div>
+      <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=80" alt="Contratos" class="card-img">
+    </div>
+
+    <!-- Estacionamiento + Reservaciones + Visitas — tres iguales -->
+    <div class="cards-row">
+      <div class="card card-surface card-third">
+        <div class="card-content">
+          <h2>Estacionamiento</h2>
+          <p>Asignación de cajones y disponibilidad por edificio.</p>
+          <div class="card-actions">
+            <a routerLink="/login" class="card-btn card-btn-dark clickable">Más información</a>
+          </div>
+        </div>
+        <img src="https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=600&q=80" alt="Estacionamiento" class="card-img">
+      </div>
+      <div class="card card-surface card-third">
+        <div class="card-content">
+          <h2>Reservaciones</h2>
+          <p>Calendario de espacios comunes para staff e inquilinos.</p>
+          <div class="card-actions">
+            <a routerLink="/login" class="card-btn card-btn-dark clickable">Más información</a>
+          </div>
+        </div>
+        <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&q=80" alt="Reservaciones" class="card-img">
+      </div>
+      <div class="card card-surface card-third">
+        <div class="card-content">
+          <h2>Visitas</h2>
+          <p>Registro con QR y control de acceso seguro.</p>
+          <div class="card-actions">
+            <a routerLink="/login" class="card-btn card-btn-dark clickable">Más información</a>
+          </div>
+        </div>
+        <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&q=80" alt="Visitas" class="card-img">
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── About ── -->
+  <section class="scene scene-about anim">
+    <span class="scene-eyebrow">Sobre EAS</span>
+    <h2 class="scene-display-sm">Gestionar un edificio<br>no debería ser difícil</h2>
+    <p class="scene-body">
+      EAS nace de la necesidad de dejar atrás las hojas de cálculo, las llamadas
+      interminables y las herramientas dispersas. Una sola interfaz para toda la
+      operación — desde contratos hasta accesos.
+    </p>
+    <div class="about-stats">
+      <div class="stat">
+        <span class="stat-number">100%</span>
+        <span class="stat-label">Digital</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">24/7</span>
+        <span class="stat-label">Disponible</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">1</span>
+        <span class="stat-label">Plataforma</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA final ── -->
+  <section class="scene scene-final anim">
+    <h2 class="scene-display"><span class="gradient-text">Comienza hoy</span></h2>
+    <p class="scene-subtitle">Registra tu cuenta y configura tu primer edificio en minutos.</p>
+    <a routerLink="/create-account" class="btn-primary btn-lg clickable">Crear cuenta gratis</a>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="landing-footer">
+    <img src="/EAS_BLACK_LOGO.png" alt="EAS" class="footer-logo app-logo">
+    <span class="footer-text">EAS Services Building</span>
+  </footer>
+
+</div>

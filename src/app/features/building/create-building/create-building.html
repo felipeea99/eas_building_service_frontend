@@ -1,0 +1,105 @@
+<div class="create-building">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/>
+        <path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/>
+        <path d="M8 14h.01"/><path d="M16 14h.01"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Crear edificio</h2>
+      <p>Registra los datos del edificio y configura los servicios que administrará</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  <form [formGroup]="createBuildingForm" (ngSubmit)="onSubmit()">
+    <!-- Imagen del edificio -->
+    <div class="form-fields">
+      <div class="form-group full-width">
+        <label>Imagen del edificio</label>
+        <div class="image-upload-area">
+          @if (imagePreview()) {
+            <div class="image-preview-wrapper">
+              <img [src]="imagePreview()" alt="Vista previa" class="image-preview">
+              <button type="button" class="remove-image-btn" (click)="removeImage()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          } @else {
+            <label class="upload-placeholder" for="create-imageS3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <span>Seleccionar imagen</span>
+              <span class="upload-hint">JPG, PNG o WebP</span>
+            </label>
+          }
+          <input type="file" id="create-imageS3" accept="image/*" (change)="onFileSelected($event)" hidden>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nombre -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="createBuildingForm.controls.name.invalid && createBuildingForm.controls.name.touched">
+        <label for="name">Nombre del edificio</label>
+        <input type="text" id="name" formControlName="name" placeholder="Torre Norte">
+        @if (createBuildingForm.controls.name.invalid && createBuildingForm.controls.name.touched) {
+          <span class="error-msg">El nombre es requerido</span>
+        }
+      </div>
+    </div>
+
+    <!-- Dirección -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="createBuildingForm.controls.address.invalid && createBuildingForm.controls.address.touched">
+        <label for="address">Dirección</label>
+        <input type="text" id="address" formControlName="address" placeholder="Av. Siempre Viva 123">
+        @if (createBuildingForm.controls.address.invalid && createBuildingForm.controls.address.touched) {
+          <span class="error-msg">La dirección es requerida</span>
+        }
+      </div>
+    </div>
+
+    <!-- Servicios / características -->
+    <div class="checkbox-grid">
+      <label class="checkbox-field">
+        <input type="checkbox" formControlName="hasReservableSpaces">
+        <span>Espacios reservables</span>
+      </label>
+      <label class="checkbox-field">
+        <input type="checkbox" formControlName="hasParking">
+        <span>Estacionamiento</span>
+      </label>
+      <label class="checkbox-field">
+        <input type="checkbox" formControlName="trackWater">
+        <span>Monitoreo de agua</span>
+      </label>
+      <label class="checkbox-field">
+        <input type="checkbox" formControlName="trackElectricity">
+        <span>Monitoreo de electricidad</span>
+      </label>
+      <label class="checkbox-field">
+        <input type="checkbox" formControlName="trackGas">
+        <span>Monitoreo de gas</span>
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isSubmitting()" [disabled]="isSubmitting()">
+        <span class="btn-label">Crear edificio</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,122 @@
+<div class="reservable-spaces-page">
+  <div class="spaces-header">
+    <div>
+      <h1>Espacios Reservables</h1>
+      <p>{{ filteredSpaces().length }} de {{ spaces().length }} espacios</p>
+    </div>
+    <button class="reservations-link-btn" (click)="router.navigate(['/reservations', buildingId()])">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span>Ver reservaciones</span>
+    </button>
+  </div>
+
+  <app-toolbar
+    placeholder="Buscar por nombre o tipo..."
+    [filters]="toolbarFilters"
+    addLabel="Nuevo espacio"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+    (addClick)="modalService.open('create-reservable-space', { buildingId: buildingId() })"
+  />
+
+  @if (isLoading()) {
+    <div class="spaces-loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando espacios reservables...</p>
+    </div>
+  } @else if (filteredSpaces().length === 0) {
+    <div class="spaces-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <p>No se encontraron espacios reservables</p>
+    </div>
+  } @else {
+    <div class="spaces-grid">
+      @for (space of filteredSpaces(); track space.reservableSpaceId) {
+        <div class="space-card" [class.inactive]="!space.status">
+          <!-- Imagen -->
+          <div class="card-image">
+            @if (space.imageS3) {
+              <app-img-loader [src]="space.imageS3" [alt]="space.name" />
+            } @else {
+              <div class="card-image-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
+            }
+          </div>
+
+          <!-- Body -->
+          <div class="card-body">
+            <div class="card-header-row">
+              <div class="space-info">
+                <span class="space-name">{{ space.name }}</span>
+                <span class="space-type">{{ space.type }}</span>
+              </div>
+              <app-card-menu
+                [actions]="getMenuActions(space)"
+                (actionClick)="onMenuAction($event, space)"
+              />
+            </div>
+
+            <span class="space-status-badge" [class.is-active]="space.status">
+              {{ space.status ? 'Activo' : 'Inactivo' }}
+            </span>
+
+            <div class="space-details">
+              <div class="detail-row">
+                <span class="detail-label">Capacidad</span>
+                <span class="detail-value">{{ space.capacity }} personas</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Se reserva</span>
+                <span class="detail-value">{{ space.hasSchedule ? getSlotUnitLabel(space.slotUnit) : '—' }}</span>
+              </div>
+
+              @if (space.hasCost) {
+                <div class="detail-row">
+                  <span class="detail-label">Tarifa</span>
+                  <span class="detail-value rent">${{ space.rate | number:'1.2-2' }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Tipo de tarifa</span>
+                  <span class="detail-value">{{ space.reservationRateType }}</span>
+                </div>
+              } @else {
+                <div class="detail-row">
+                  <span class="detail-label">Costo</span>
+                  <span class="detail-value">Sin costo</span>
+                </div>
+              }
+            </div>
+
+            <!-- Tags -->
+            <div class="space-tags">
+              @if (!space.hasSchedule) {
+                <span class="tag tag-approval">Sin horario</span>
+              }
+              @if (space.requiresApproval) {
+                <span class="tag tag-approval">Requiere aprobación</span>
+              }
+              @if (space.hasCost) {
+                <span class="tag tag-cost">Con costo</span>
+              } @else {
+                <span class="tag tag-free">Gratis</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

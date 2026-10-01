@@ -1,0 +1,91 @@
+<div class="create-tenant-client">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <line x1="19" y1="8" x2="19" y2="14"/>
+        <line x1="22" y1="11" x2="16" y2="11"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Nuevo cliente</h2>
+      <p>Registra un nuevo cliente inquilino</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Nombre y Segundo nombre -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.firstName.invalid && form.controls.firstName.touched">
+        <label for="tc-firstName">Nombre *</label>
+        <input type="text" id="tc-firstName" formControlName="firstName" placeholder="Juan">
+        @if (form.controls.firstName.invalid && form.controls.firstName.touched) {
+          <span class="error-msg">El nombre es requerido</span>
+        }
+      </div>
+      <div class="form-group">
+        <label for="tc-middleName">Segundo nombre</label>
+        <input type="text" id="tc-middleName" formControlName="middleName" placeholder="Carlos">
+      </div>
+    </div>
+
+    <!-- Apellido paterno y materno -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.lastName.invalid && form.controls.lastName.touched">
+        <label for="tc-lastName">Apellido paterno *</label>
+        <input type="text" id="tc-lastName" formControlName="lastName" placeholder="Pérez">
+        @if (form.controls.lastName.invalid && form.controls.lastName.touched) {
+          <span class="error-msg">El apellido es requerido</span>
+        }
+      </div>
+      <div class="form-group">
+        <label for="tc-secondLastName">Apellido materno</label>
+        <input type="text" id="tc-secondLastName" formControlName="secondLastName" placeholder="López">
+      </div>
+    </div>
+
+    <!-- Email y Teléfono -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.email.invalid && form.controls.email.touched">
+        <label for="tc-email">Email *</label>
+        <input type="email" id="tc-email" formControlName="email" placeholder="juan@ejemplo.com">
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <span class="error-msg">Ingresa un email válido</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched">
+        <label for="tc-phone">Teléfono *</label>
+        <input type="tel" id="tc-phone" formControlName="phoneNumber" placeholder="55 1234 5678">
+        @if (form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) {
+          <span class="error-msg">Ingresa 10 dígitos numéricos</span>
+        }
+      </div>
+    </div>
+
+    <!-- Empresa y RFC -->
+    <div class="form-fields">
+      <div class="form-group">
+        <label for="tc-company">Empresa</label>
+        <input type="text" id="tc-company" formControlName="companyName" placeholder="Mi Empresa S.A.">
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.rfc.invalid && form.controls.rfc.touched">
+        <label for="tc-rfc">RFC</label>
+        <input type="text" id="tc-rfc" formControlName="rfc" placeholder="XAXX010101000">
+        @if (form.controls.rfc.invalid && form.controls.rfc.touched) {
+          <span class="error-msg">RFC inválido</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isSubmitting()" [disabled]="isSubmitting()">
+        <span class="btn-label">Crear cliente</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

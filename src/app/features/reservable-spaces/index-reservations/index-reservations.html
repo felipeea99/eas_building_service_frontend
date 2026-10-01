@@ -1,0 +1,146 @@
+<div class="reservations-page">
+  <div class="reservations-header">
+    <div>
+      <h1>Reservaciones</h1>
+      <p>{{ reservations().length }} reservaciones encontradas</p>
+    </div>
+    <button class="new-reservation-btn" (click)="openCreateModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      <span>Nueva reservación</span>
+    </button>
+  </div>
+
+  <!-- Space filter -->
+  <div class="filter-bar">
+    <div class="filter-select-wrap">
+      <select (change)="onSpaceFilter($event)">
+        <option value="">Todos los espacios</option>
+        @for (space of spaces(); track space.reservableSpaceId) {
+          <option [value]="space.reservableSpaceId">{{ space.name }}</option>
+        }
+      </select>
+      <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </div>
+    <button class="today-btn" (click)="goToToday()">Hoy</button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando reservaciones...</p>
+    </div>
+  } @else {
+    <div class="calendar-layout">
+      <!-- Calendar (left) -->
+      <div class="calendar">
+        <div class="calendar-nav">
+          <button class="cal-nav-btn" (click)="prevMonth()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <span class="cal-month-label">{{ currentMonthLabel() }}</span>
+          <button class="cal-nav-btn" (click)="nextMonth()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="calendar-grid">
+          @for (day of weekDays; track day) {
+            <div class="cal-weekday">{{ day }}</div>
+          }
+          @for (day of calendarDays(); track $index) {
+            <div class="cal-day"
+                 [class.other-month]="!day.isCurrentMonth"
+                 [class.is-today]="day.isToday"
+                 [class.has-reservations]="day.reservations.length > 0"
+                 [class.is-selected]="selectedDay()?.date?.toDateString() === day.date.toDateString()"
+                 (click)="selectDay(day)">
+              <span class="day-number">{{ day.date.getDate() }}</span>
+              @if (day.reservations.length > 0 && day.isCurrentMonth) {
+                <div class="day-dots">
+                  @for (r of day.reservations.slice(0, 3); track r.id) {
+                    <span class="dot" [class]="getStatusClass(r.status)"></span>
+                  }
+                  @if (day.reservations.length > 3) {
+                    <span class="dot-more">+{{ day.reservations.length - 3 }}</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Detail panel (right sidebar) -->
+      <div class="detail-panel">
+        @if (selectedDay(); as day) {
+          <div class="detail-header">
+            <h3>{{ day.date | date:'EEEE d MMMM' }}</h3>
+            <button class="close-detail" (click)="closeDetail()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+
+          @if (day.reservations.length === 0) {
+            <div class="detail-empty">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <p>Sin reservaciones este día</p>
+              <button class="detail-add-btn" (click)="openCreateModal()">Crear reservación</button>
+            </div>
+          } @else {
+            <div class="detail-list">
+              @for (r of day.reservations; track r.id) {
+                <div class="reservation-item">
+                  <div class="res-top">
+                    <span class="res-space">{{ r.spaceName }}</span>
+                    <span class="res-status" [class]="getStatusClass(r.status)">
+                      {{ getStatusLabel(r.status) }}
+                    </span>
+                  </div>
+                  <div class="res-time">
+                    {{ r.startTime | date:'HH:mm' }} — {{ r.endTime | date:'HH:mm' }}
+                  </div>
+                  <div class="res-meta">
+                    <span class="res-tenant">{{ r.tenantClientName }}</span>
+                    @if (r.totalCost > 0) {
+                      <span class="res-cost">${{ r.totalCost | number:'1.2-2' }}</span>
+                    }
+                  </div>
+                  @if (r.purpose) {
+                    <p class="res-purpose">{{ r.purpose }}</p>
+                  }
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <div class="detail-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <p>Selecciona un día para ver las reservaciones</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

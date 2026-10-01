@@ -1,0 +1,93 @@
+<div class="send-notification">
+  <div class="form-head">
+    <div class="head-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3Z"/>
+        <path d="M8.5 17v.5a3.5 3.5 0 1 0 7 0V17"/>
+      </svg>
+    </div>
+    <div class="head-text">
+      <h2>Enviar notificacion</h2>
+      <p>Envia una notificacion a los usuarios del edificio o de todo el tenant</p>
+    </div>
+  </div>
+
+  <hr class="form-divider">
+
+  @if (serverError()) {
+    <div class="server-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+      </svg>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Tipo de evento y Destino -->
+    <div class="form-fields">
+      <div class="form-group" [class.invalid]="form.controls.eventType.invalid && form.controls.eventType.touched">
+        <label for="sn-eventType">Tipo de evento</label>
+        <select id="sn-eventType" formControlName="eventType">
+          @for (type of eventTypes; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+          }
+        </select>
+        @if (form.controls.eventType.invalid && form.controls.eventType.touched) {
+          <span class="error-msg">Selecciona un tipo de evento</span>
+        }
+      </div>
+      <div class="form-group" [class.invalid]="form.controls.destination.invalid && form.controls.destination.touched">
+        <label for="sn-destination">Destino</label>
+        <select id="sn-destination" formControlName="destination">
+          @for (dest of destinations; track dest.value) {
+            <option [value]="dest.value">{{ dest.label }}</option>
+          }
+        </select>
+        @if (form.controls.destination.invalid && form.controls.destination.touched) {
+          <span class="error-msg">Selecciona un destino</span>
+        }
+      </div>
+    </div>
+
+    <!-- Titulo -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="form.controls.title.invalid && form.controls.title.touched">
+        <label for="sn-title">Titulo</label>
+        <input id="sn-title" type="text" formControlName="title" placeholder="Ej: Mantenimiento programado" maxlength="120" />
+        @if (form.controls.title.invalid && form.controls.title.touched) {
+          @if (form.controls.title.hasError('required')) {
+            <span class="error-msg">El titulo es obligatorio</span>
+          } @else if (form.controls.title.hasError('minlength')) {
+            <span class="error-msg">Minimo 3 caracteres</span>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Mensaje -->
+    <div class="form-fields">
+      <div class="form-group full-width" [class.invalid]="form.controls.message.invalid && form.controls.message.touched">
+        <label for="sn-message">Mensaje</label>
+        <textarea id="sn-message" formControlName="message" placeholder="Escribe el contenido de la notificacion..." rows="4" maxlength="500"></textarea>
+        <span class="char-counter" [class.warn]="messageCharsLeft < 50">{{ messageCharsLeft }} caracteres restantes</span>
+        @if (form.controls.message.invalid && form.controls.message.touched) {
+          @if (form.controls.message.hasError('required')) {
+            <span class="error-msg">El mensaje es obligatorio</span>
+          } @else if (form.controls.message.hasError('minlength')) {
+            <span class="error-msg">Minimo 5 caracteres</span>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()">
+        <span class="btn-label">Enviar notificacion</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+  </form>
+</div>

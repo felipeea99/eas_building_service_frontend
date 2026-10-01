@@ -1,0 +1,200 @@
+<div class="index-visits-page">
+  <div class="visits-header">
+    <div class="header-left">
+      <h1>Visitas autorizadas</h1>
+      <p>{{ filteredVisits().length }} de {{ visits().length }} visitas</p>
+    </div>
+    @if (isStaff) {
+      <button type="button" class="qr-scanner-btn" (click)="router.navigate(['/qr-scanner'])">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        Escanear QR
+      </button>
+    }
+  </div>
+
+  <app-toolbar
+    placeholder="Buscar por nombre o propósito..."
+    [filters]="toolbarFilters"
+    addLabel="Nueva visita"
+    (search)="onSearch($event)"
+    (filterChange)="onFilterChange($event)"
+    (addClick)="onAddVisit()"
+  />
+
+  @if (isLoading()) {
+    <div class="visits-loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando visitas...</p>
+    </div>
+  } @else if (filteredVisits().length === 0) {
+    <div class="visits-empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <p>No se encontraron visitas</p>
+    </div>
+  } @else {
+    <!-- Table desktop -->
+    <div class="visits-table-wrapper">
+      <table class="visits-table">
+        <thead>
+          <tr>
+            <th>Visitante</th>
+            <th>Propósito</th>
+            <th>Desde</th>
+            <th>Hasta</th>
+            <th>QR</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (visit of filteredVisits(); track visit.id) {
+            <tr class="visit-row">
+              <td class="cell-visitor">
+                <div class="visitor-info">
+                  <span class="visitor-name">{{ visit.visitorName }}</span>
+                  @if (visit.visitorPhone) {
+                    <span class="visitor-phone">{{ visit.visitorPhone }}</span>
+                  }
+                </div>
+              </td>
+              <td>{{ visit.purpose ?? '—' }}</td>
+              <td class="cell-date">{{ visit.validFrom | date:'dd/MM/yy HH:mm' }}</td>
+              <td class="cell-date">{{ visit.validUntil | date:'dd/MM/yy HH:mm' }}</td>
+              <td class="cell-qr">
+                @if (qrImages()[visit.id]) {
+                  <button type="button" class="qr-thumb-btn" (click)="openQRModal(visit)" title="Ver QR">
+                    <img [src]="qrImages()[visit.id]" alt="QR" class="qr-thumb">
+                  </button>
+                }
+              </td>
+              <td>
+                <span class="visit-status" [class]="getStatusClass(visit)">{{ getStatusLabel(visit) }}</span>
+              </td>
+              <td class="cell-actions">
+                @if (isStaff) {
+                  @if (visit.isValid && !visit.isInside && !visit.isCancelled) {
+                    <button type="button" class="row-action-btn action-entry" (click)="registerEntry(visit)" title="Entrada">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10 17 15 12 10 7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                      </svg>
+                    </button>
+                  }
+                  @if (visit.isInside) {
+                    <button type="button" class="row-action-btn action-exit" (click)="registerExit(visit)" title="Salida">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                      </svg>
+                    </button>
+                  }
+                }
+                @if (!visit.isCancelled && visit.isValid) {
+                  <button type="button" class="row-action-btn action-cancel" (click)="cancelVisit(visit)" title="Cancelar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="15" y1="9" x2="9" y2="15"/>
+                      <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards mobile -->
+    <div class="visits-cards-mobile">
+      @for (visit of filteredVisits(); track visit.id) {
+        <div class="mobile-card">
+          <div class="mobile-card-header">
+            <div class="mobile-top-left">
+              <span class="mobile-visitor-name">{{ visit.visitorName }}</span>
+              @if (visit.visitorPhone) {
+                <span class="mobile-visitor-phone">{{ visit.visitorPhone }}</span>
+              }
+            </div>
+            <span class="visit-status" [class]="getStatusClass(visit)">{{ getStatusLabel(visit) }}</span>
+          </div>
+          <div class="mobile-card-body">
+            <div class="mobile-detail">
+              <span class="mobile-label">Propósito</span>
+              <span class="mobile-value">{{ visit.purpose ?? '—' }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Desde</span>
+              <span class="mobile-value">{{ visit.validFrom | date:'dd/MM/yy HH:mm' }}</span>
+            </div>
+            <div class="mobile-detail">
+              <span class="mobile-label">Hasta</span>
+              <span class="mobile-value">{{ visit.validUntil | date:'dd/MM/yy HH:mm' }}</span>
+            </div>
+            @if (qrImages()[visit.id]) {
+              <div class="mobile-detail">
+                <span class="mobile-label">QR</span>
+                <button type="button" class="qr-thumb-btn" (click)="openQRModal(visit)">
+                  <img [src]="qrImages()[visit.id]" alt="QR" class="qr-thumb">
+                </button>
+              </div>
+            }
+          </div>
+          <div class="mobile-actions">
+            @if (isStaff && visit.isValid && !visit.isInside && !visit.isCancelled) {
+              <button type="button" class="mobile-action-btn action-entry" (click)="registerEntry(visit)">Entrada</button>
+            }
+            @if (isStaff && visit.isInside) {
+              <button type="button" class="mobile-action-btn action-exit" (click)="registerExit(visit)">Salida</button>
+            }
+            @if (!visit.isCancelled && visit.isValid) {
+              <button type="button" class="mobile-action-btn action-cancel" (click)="cancelVisit(visit)">Cancelar</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- QR Lightbox -->
+@if (qrModalVisit()) {
+  <div class="qr-lightbox-overlay" (click)="closeQRModal()">
+    <div class="qr-lightbox" (click)="$event.stopPropagation()">
+      <button type="button" class="lightbox-close" (click)="closeQRModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <img [src]="qrModalLargeImage()" alt="Código QR ampliado" class="lightbox-qr-image">
+      <div class="lightbox-info">
+        <span class="lightbox-name">{{ qrModalVisit()!.visitorName }}</span>
+        <span class="lightbox-purpose">{{ qrModalVisit()!.purpose ?? 'Sin propósito' }}</span>
+      </div>
+      <button type="button" class="lightbox-download-btn" (click)="downloadQR(qrModalVisit()!)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Descargar QR
+      </button>
+    </div>
+  </div>
+}

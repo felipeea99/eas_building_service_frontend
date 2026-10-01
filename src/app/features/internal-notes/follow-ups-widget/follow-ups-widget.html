@@ -1,0 +1,29 @@
+@if (isLoaded() && totalCount() > 0) {
+  <section class="follow-ups-widget">
+    <div class="widget-head">
+      <div class="widget-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <h2>Seguimientos pendientes</h2>
+        <span class="count-badge">{{ totalCount() }}</span>
+      </div>
+      <a routerLink="/follow-ups" class="see-all">Ver todos</a>
+    </div>
+
+    <ul class="widget-list">
+      @for (item of items(); track item.id) {
+        <li>
+          <button type="button" class="widget-row" (click)="openNotes(item)">
+            <span class="row-date">{{ item.followUpDate | date:'dd/MM':'UTC' }}</span>
+            <span class="row-main">
+              <span class="row-client">{{ item.tenantClientName }}</span>
+              <span class="row-body">{{ getCategoryLabel(item.category) }} · {{ item.body }}</span>
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+}

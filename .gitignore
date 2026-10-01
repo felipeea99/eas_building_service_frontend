@@ -42,3 +42,10 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+#Graphify
+graphify-out
+
+#CLAUDE
+CLAUDE.md
+EAS_DESIGN_SYSTEM.md
